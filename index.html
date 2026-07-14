@@ -150,6 +150,10 @@
   .tc-lab { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-3); margin-top: 8px; }
   .tc-sub { font-size: 12px; color: var(--ink-2); margin-top: 12px; font-variant-numeric: tabular-nums; }
 
+  /* ---- Straight road (unrolled ring) ---- */
+  #strip2Wrap { padding: 14px 18px 12px; }
+  #track2 { width: 100%; height: auto; display: block; border-radius: 10px; }
+
   /* ---- Space-time ---- */
   #stWrap { padding: 6px 18px 16px; }
   #spacetime { width: 100%; height: 260px; display: block; border-radius: 8px; image-rendering: pixelated; background: var(--bg-grad-2); }
@@ -461,6 +465,17 @@
           <span class="lg-item"><span class="dot" style="background:var(--jam)"></span>ustavljeno</span>
           <span class="lg-bar"></span>
           <span class="lg-item"><span class="dot" style="background:var(--flow)"></span>prost tok</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Ista cesta kot premica</span>
+          <span class="card-note">krog »odvit« v ravno cesto</span>
+        </div>
+        <div id="strip2Wrap">
+          <canvas id="track2" width="1000" height="94"></canvas>
+          <div class="st-axis"><span>smer vožnje &rarr;</span><span>konec se poveže z začetkom (zanka)</span></div>
         </div>
       </div>
 
@@ -804,6 +819,7 @@
   // ---------- Elements ----------
   const $ = id => document.getElementById(id);
   const track = $("track"), tctx = track.getContext("2d");
+  const track2 = $("track2"), t2ctx = track2.getContext("2d");
   const st = $("spacetime"), sctx = st.getContext("2d");
   const stW = st.width, stH = st.height;
   const fd = $("fd"), fctx = fd.getContext("2d");
@@ -929,6 +945,26 @@
   }
 
   // ---------- Track render ----------
+  // small top-down car icon, coloured by speed, pointing along `angle`
+  function carIcon(ctx, x, y, angle, len, wid, col) {
+    const r = Math.min(wid * 0.4, 3);
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(angle);
+    // body
+    ctx.fillStyle = rgb(col);
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(-len/2, -wid/2, len, wid, r); else ctx.rect(-len/2, -wid/2, len, wid);
+    ctx.fill();
+    // windshield / cabin (light patch toward the front)
+    ctx.fillStyle = "rgba(255,255,255,0.34)";
+    const cw = len * 0.30, ch = wid * 0.64;
+    ctx.beginPath();
+    if (ctx.roundRect) ctx.roundRect(len*0.04, -ch/2, cw, ch, r*0.6); else ctx.rect(len*0.04, -ch/2, cw, ch);
+    ctx.fill();
+    ctx.restore();
+  }
+
   function drawTrack() {
     const W = track.width, H = track.height, cx = W/2, cy = H/2;
     const R = Math.min(W, H) * 0.40;
@@ -948,25 +984,50 @@
     tctx.strokeStyle = getVar("--edge");
     tctx.stroke();
     tctx.setLineDash([]);
-    // cars
-    const carLen = lane * 0.92;
+    // cars as little icons, sized so they just touch at the current density
+    const spacing = (2 * Math.PI * R) / Math.max(cars.length, 1);
+    const carLen = Math.max(7, Math.min(lane * 1.0, spacing * 0.9));
+    const carW = carLen * 0.54;
     for (const c of cars) {
       const ang = (c.pos / ROAD_CELLS) * Math.PI*2 - Math.PI/2;
       const frac = P.vmax > 0 ? c.v / P.vmax : 0;
       const col = speedColor(frac);
       const x = cx + Math.cos(ang) * R;
       const y = cy + Math.sin(ang) * R;
-      // glow for slow cars (brake lights)
-      if (frac < 0.4) {
+      if (frac < 0.4) {   // brake-light glow for slow cars
         tctx.beginPath();
-        tctx.arc(x, y, carLen*0.95, 0, Math.PI*2);
+        tctx.arc(x, y, carLen*0.7, 0, Math.PI*2);
         tctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.22*(1-frac)})`;
         tctx.fill();
       }
-      tctx.beginPath();
-      tctx.arc(x, y, carLen*0.5, 0, Math.PI*2);
-      tctx.fillStyle = rgb(col);
-      tctx.fill();
+      carIcon(tctx, x, y, ang + Math.PI/2, carLen, carW, col);   // heading = clockwise tangent
+    }
+  }
+
+  // the same simulation, drawn as a straight road (ring "unrolled" to a line)
+  function drawStrip() {
+    const W = track2.width, H = track2.height;
+    const laneY = H/2, laneH = H*0.62;
+    t2ctx.clearRect(0, 0, W, H);
+    t2ctx.fillStyle = getVar("--track");
+    t2ctx.fillRect(0, laneY - laneH/2, W, laneH);
+    t2ctx.strokeStyle = getVar("--edge"); t2ctx.setLineDash([14, 14]); t2ctx.lineWidth = 2;
+    t2ctx.beginPath(); t2ctx.moveTo(0, laneY); t2ctx.lineTo(W, laneY); t2ctx.stroke(); t2ctx.setLineDash([]);
+    const sx = W / ROAD_CELLS;
+    const avg = W / Math.max(cars.length, 1);
+    const carLen = Math.max(8, Math.min(18, avg * 0.85));
+    const carW = Math.min(laneH * 0.6, carLen * 0.58);
+    for (const c of cars) {
+      const x = c.pos * sx;
+      const frac = P.vmax > 0 ? c.v / P.vmax : 0;
+      const col = speedColor(frac);
+      if (frac < 0.4) {
+        t2ctx.beginPath();
+        t2ctx.arc(x, laneY, carLen*0.7, 0, Math.PI*2);
+        t2ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.22*(1-frac)})`;
+        t2ctx.fill();
+      }
+      carIcon(t2ctx, x, laneY, 0, carLen, carW, col);   // travel direction = right
     }
   }
 
@@ -1089,6 +1150,7 @@
       while (acc >= 1 && steps < 40) { step(); acc -= 1; steps++; }
     }
     drawTrack();
+    drawStrip();
     const m = metrics();
     // recompute the fundamental-diagram curve shortly after params settle
     if (fdChangeAt && now - fdChangeAt > 130) { computeFD(); fdChangeAt = 0; }
