@@ -4,6 +4,13 @@ Interaktivni simulator **fantomskih zastojev** (angl. *phantom traffic jams*) �
 
 Poskus pripravil **Jan Macarol**.
 
+Simulator ponuja **dva poskusa**:
+
+1. **Krožna proga** — vozila krožijo v zaprti zanki (à la Sugiyama, 2008). Fantomski zastoji nastanejo spontano iz naključnih mikro-zaviranj. Nastavljivi parametri: hitrost, verjetnost dogodka, jakost zaviranja, gostota.
+2. **En avto zavre** — raven kilometer ceste **brez naključnih motenj**. S klikom ustavite eno vozilo in opazujete, kako za njim nastane trajna kolona, ki potuje nazaj po cesti — tudi ko vaše vozilo že odpelje naprej.
+
+Privzete vrednosti so umerjene na **realni slovenski avtocestni promet** (omejitev 130 km/h, ~10 % nepozornost, gost promet 30 voz/km → zmogljivost pasu ~2400 voz/h, kar ustreza literaturi 2000–2400 voz/h/pas).
+
 Odprite [`index.html`](index.html) v brskalniku. Datoteka je samostojna (brez zunanjih odvisnosti).
 
 ## Parametri

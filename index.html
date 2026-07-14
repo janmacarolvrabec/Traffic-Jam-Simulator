@@ -170,6 +170,8 @@
   .ctrl-hint { font-size: 11px; color: var(--ink-3); }
   .ctrl-val { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); }
   .ctrl-val span { font-size: 11px; color: var(--ink-3); font-weight: 600; margin-left: 2px; }
+  .ctrl-desc { font-size: 12px; color: var(--ink-3); line-height: 1.45; margin-top: 2px; }
+  .ctrl-desc b { color: var(--ink-2); font-weight: 600; }
 
   input[type="range"] { width: 100%; height: 22px; background: transparent; }
   input[type="range"]::-webkit-slider-runnable-track { height: 5px; border-radius: 999px; background: var(--edge); }
@@ -225,6 +227,20 @@
   .fd-legend span { display: inline-flex; align-items: center; gap: 7px; }
   .fd-swatch { width: 14px; height: 3px; border-radius: 2px; }
 
+  /* ---- Experiment 2: straight road ---- */
+  #roadWrap { padding: 16px 18px 8px; position: relative; }
+  #road { width: 100%; height: auto; display: block; border-radius: 10px; cursor: pointer; }
+  .road-hint {
+    position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+    font-size: 12.5px; font-weight: 600; color: var(--ink); background: var(--panel);
+    border: 1px solid var(--accent); padding: 7px 14px; border-radius: 999px;
+    pointer-events: none; transition: opacity .4s; box-shadow: var(--shadow);
+  }
+  #e2stWrap { padding: 4px 18px 12px; }
+  #roadST { width: 100%; height: 150px; display: block; border-radius: 8px; image-rendering: pixelated; background: var(--bg-grad-2); }
+  .e2-controls { display: flex; align-items: flex-end; gap: 14px; padding: 6px 18px 14px; flex-wrap: wrap; }
+  .e2-controls .btn { flex: none; }
+
   /* ---- Share ---- */
   .share { display: flex; align-items: center; gap: 12px; padding: 16px 18px; flex-wrap: wrap; }
   .share-lab { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-right: 2px; }
@@ -260,6 +276,23 @@
 
   .col { display: flex; flex-direction: column; gap: 18px; }
 
+  /* ---- Experiment guide ---- */
+  .guide { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
+  @media (max-width: 760px) { .guide { grid-template-columns: 1fr; } }
+  .guide .card { padding: 18px 20px; display: flex; flex-direction: column; gap: 9px; }
+  .g-tag { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; color: var(--accent); }
+  .g-title { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+  .g-desc { font-size: 13.5px; color: var(--ink-2); }
+  .g-how { font-size: 12.5px; color: var(--ink-3); display: flex; align-items: flex-start; gap: 8px; margin-top: 2px; }
+  .g-how b { color: var(--ink-2); font-weight: 600; }
+  .g-how::before { content: "▸"; color: var(--accent); font-size: 12px; line-height: 1.5; }
+
+  /* ---- Section label ---- */
+  .section-label { display: flex; align-items: baseline; gap: 14px; margin: 30px 0 14px; flex-wrap: wrap; }
+  .section-label .sl-num { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; }
+  .section-label h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+  .section-label .sl-sub { font-size: 13px; color: var(--ink-3); }
+
   @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
 </style>
 </head>
@@ -269,11 +302,33 @@
     <div class="brand">
       <div class="eyebrow">Prometna dinamika &middot; Model Nagel–Schreckenberg</div>
       <h1>Simulator <em>fantomskih</em> zastojev</h1>
-      <p class="lede">Zastoj brez ovire. Ena sama previdna zavora se ojača v val, ki potuje <em>nazaj</em> po cesti &mdash; točno kot v Sugiyamovem poskusu s krožno progo. Nastavite parametre in opazujte, kdaj promet razpade.</p>
+      <p class="lede">Ste že obstali v koloni, ki se je nenadoma razpustila &mdash; brez nesreče, brez gradbišča, brez razloga? To je <em>fantomski zastoj</em>. Nastane sam od sebe: ena previdna zavora se ojača v val, ki potuje <em>nazaj</em> po cesti hitreje, kot vozniki mislijo. Ta simulator to pokaže na dva načina, s parametri, umerjenimi na <b>realni slovenski avtocestni promet</b>.</p>
       <p class="byline">Poskus pripravil <b>Jan Macarol</b></p>
     </div>
     <button class="theme-btn" id="themeBtn" aria-label="Preklopi temo"><span id="themeIcon">&#9788;</span> <span id="themeTxt">Svetla tema</span></button>
   </header>
+
+  <!-- GUIDE -->
+  <div class="guide">
+    <div class="card">
+      <span class="g-tag">Poskus 1</span>
+      <span class="g-title">Krožna proga</span>
+      <p class="g-desc">Vozila krožijo v zaprti zanki pri stalni gostoti &mdash; kot 22 avtomobilov v Sugiyamovem poskusu (2008). Nihče se ne zaleti, a promet vseeno razpade sam od sebe.</p>
+      <span class="g-how"><span><b>Kaj storiti:</b> premikajte štiri drsnike in opazujte, kdaj se pojavijo temne diagonale na časovnem diagramu &mdash; to so fantomski zastoji.</span></span>
+    </div>
+    <div class="card">
+      <span class="g-tag">Poskus 2</span>
+      <span class="g-title">En avto zavre</span>
+      <p class="g-desc">Raven kilometer ceste brez naključnih motenj &mdash; promet bi tekel v nedogled. Dokler ne posežete vmes vi.</p>
+      <span class="g-how"><span><b>Kaj storiti:</b> <b>kliknite na vozilo</b>, da ga za trenutek ustavite. Za njim nastane kolona, ki ostane in potuje nazaj &mdash; tudi ko vaše vozilo že odpelje.</span></span>
+    </div>
+  </div>
+
+  <div class="section-label">
+    <span class="sl-num">Poskus 1</span>
+    <h2>Krožna proga</h2>
+    <span class="sl-sub">3,0 km zaprta zanka &middot; privzeto: slovenska avtocesta v gostem prometu</span>
+  </div>
 
   <div class="grid">
     <!-- LEFT: visualizations -->
@@ -327,34 +382,38 @@
         <div class="controls">
           <div class="ctrl">
             <div class="ctrl-top">
-              <div><div class="ctrl-name">Hitrost</div><div class="ctrl-hint">omejitev / želena hitrost</div></div>
-              <div class="ctrl-val" id="vSpeed">108<span>km/h</span></div>
+              <div><div class="ctrl-name">Hitrost</div><div class="ctrl-hint">omejitev oz. želena hitrost vozil</div></div>
+              <div class="ctrl-val" id="vSpeed">130<span>km/h</span></div>
             </div>
-            <input type="range" id="sSpeed" min="27" max="162" step="27" value="108">
+            <input type="range" id="sSpeed" min="40" max="160" step="10" value="130">
+            <div class="ctrl-desc">Najvišja hitrost, ki jo vozniki poskušajo doseči. <b>Realno v SLO:</b> avtocesta 130, hitra cesta 110, izven naselij 90, v naselju 50 km/h. Višja hitrost pomeni večje razdalje &mdash; a tudi hitrejše širjenje motenj.</div>
           </div>
 
           <div class="ctrl">
             <div class="ctrl-top">
-              <div><div class="ctrl-name">Verjetnost dogodka</div><div class="ctrl-hint">naključno zaviranje / nepozornost</div></div>
-              <div class="ctrl-val" id="vProb">25<span>%</span></div>
+              <div><div class="ctrl-name">Verjetnost dogodka</div><div class="ctrl-hint">naključno mikro-zaviranje / nepozornost</div></div>
+              <div class="ctrl-val" id="vProb">10<span>%</span></div>
             </div>
-            <input type="range" id="sProb" min="0" max="60" step="1" value="25">
+            <input type="range" id="sProb" min="0" max="50" step="1" value="10">
+            <div class="ctrl-desc">Verjetnost, da voznik v vsaki sekundi brez potrebe malce popusti plin ali zavre. To je <b>vzrok fantomskih zastojev</b>. <b>Realno:</b> ~5&ndash;15 %. Pri <b>0 %</b> promet nikoli ne razpade &mdash; poskusite!</div>
           </div>
 
           <div class="ctrl">
             <div class="ctrl-top">
-              <div><div class="ctrl-name">Jakost zaviranja</div><div class="ctrl-hint">koliko voznik pretirano zavre</div></div>
-              <div class="ctrl-val" id="vBrake">2<span>× hitrost</span></div>
+              <div><div class="ctrl-name">Jakost zaviranja</div><div class="ctrl-hint">kako močno voznik pretirano zavre</div></div>
+              <div class="ctrl-val" id="vBrake">1<span>× stopnja</span></div>
             </div>
-            <input type="range" id="sBrake" min="1" max="3" step="1" value="2">
+            <input type="range" id="sBrake" min="1" max="3" step="1" value="1">
+            <div class="ctrl-desc">Prereakcija ob dogodku. <b>1</b> = blaga zavora (~27 km/h manj), <b>3</b> = sunkovito zaviranje (~80 km/h manj). Močnejše zaviranje sproža večje in trajnejše kolone.</div>
           </div>
 
           <div class="ctrl">
             <div class="ctrl-top">
-              <div><div class="ctrl-name">Gostota prometa</div><div class="ctrl-hint">vozil na kilometer</div></div>
-              <div class="ctrl-val" id="vDens">33<span>voz/km</span></div>
+              <div><div class="ctrl-name">Gostota prometa</div><div class="ctrl-hint">število vozil na kilometer pasu</div></div>
+              <div class="ctrl-val" id="vDens">30<span>voz/km</span></div>
             </div>
-            <input type="range" id="sDens" min="5" max="110" step="1" value="33">
+            <input type="range" id="sDens" min="5" max="120" step="1" value="30">
+            <div class="ctrl-desc">Koliko vozil je na kilometru. <b>Realno:</b> prost promet &lt;20, gost 25&ndash;40, zastoj &gt;60, polna kolona ~133 voz/km (odbijač ob odbijač). Nad kritično gostoto pretok pade &mdash; glej temeljni diagram spodaj.</div>
           </div>
         </div>
         <div class="transport">
@@ -386,6 +445,40 @@
       <span><span class="fd-swatch" style="background:var(--flow);height:10px;width:10px;border-radius:50%"></span>trenutno stanje (v živo)</span>
       <span><span class="fd-swatch" style="background:var(--jam);height:10px;width:2px"></span>kritična gostota (vrh)</span>
     </div>
+  </div>
+
+  <!-- EXPERIMENT 2: single-car stop -->
+  <div class="section-label">
+    <span class="sl-num">Poskus 2</span>
+    <h2>Kolona zaradi enega vozila</h2>
+    <span class="sl-sub">raven kilometer &middot; brez naključnih motenj &middot; edini vzrok ste vi</span>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Klikni in ustavi vozilo</span>
+      <span class="card-note" id="e2Note">&mdash; vozil</span>
+    </div>
+    <div id="roadWrap">
+      <canvas id="road" width="1000" height="120"></canvas>
+      <div class="road-hint" id="roadHint">👆 Kliknite na vozilo, da ga za trenutek ustavite</div>
+    </div>
+    <div id="e2stWrap">
+      <canvas id="roadST" width="1000" height="150"></canvas>
+      <div class="st-axis"><span>&larr; smer vožnje &middot; položaj (1 km)</span><span>čas &darr;</span></div>
+    </div>
+    <div class="e2-controls">
+      <div class="ctrl" style="flex:1; min-width:220px">
+        <div class="ctrl-top">
+          <div class="ctrl-name">Gostota prometa</div>
+          <div class="ctrl-val" id="e2vDens">32<span>voz/km</span></div>
+        </div>
+        <input type="range" id="e2Dens" min="8" max="80" step="1" value="32">
+      </div>
+      <button class="btn" id="e2Stop">&#9211; Ustavi naključno vozilo</button>
+      <button class="btn" id="e2Reset">&#8635; Ponastavi</button>
+    </div>
+    <p class="share-note">Tu ni naključnih dogodkov (verjetnost je 0 %), zato bi promet tekel v nedogled &mdash; edini vzrok kolone je vaš klik. Opazujte: val zastoja potuje <b>nazaj</b> po cesti pri ~15 km/h in ostane, čeprav vaše vozilo že dolgo vozi naprej. Prav to se dogaja na avtocesti, ko en voznik sunkovito zavre.</p>
   </div>
 
   <!-- EXPLAIN -->
@@ -448,11 +541,13 @@
   const KMH_PER_CELL = CELL_M / DT_S * 3.6;   // one cell/step in km/h (=27)
 
   // ---------- State ----------
+  // Defaults calibrated to a busy Slovenian motorway lane:
+  // 130 km/h limit, ~10% driver imperfection, gentle braking, dense-but-flowing traffic.
   const P = {
-    vmax: 4,       // cells/step
-    prob: 0.25,    // slowdown probability
-    brake: 2,      // cells removed on a slowdown event
-    density: 33,   // veh/km
+    vmax: 5,       // cells/step (~130-135 km/h)
+    prob: 0.10,    // slowdown probability (realistic 5-15%)
+    brake: 1,      // cells removed on a slowdown event (gentle)
+    density: 30,   // veh/km (heavy motorway traffic, near breakdown)
     rate: 10       // steps per second
   };
   let cars = [];   // {pos, v} sorted ascending by pos
@@ -767,12 +862,12 @@
     fn(parseFloat(el.value));
   }
   bindSlider("sSpeed", "vSpeed", v => {
-    P.vmax = Math.round(v / KMH_PER_CELL);
-    $("vSpeed").innerHTML = Math.round(P.vmax * KMH_PER_CELL) + '<span>km/h</span>';
+    P.vmax = Math.max(1, Math.round(v / KMH_PER_CELL));
+    $("vSpeed").innerHTML = v + '<span>km/h</span>';   // show chosen limit directly
     fdChangeAt = performance.now();
   });
   bindSlider("sProb", "vProb", v => { P.prob = v/100; $("vProb").innerHTML = v + '<span>%</span>'; fdChangeAt = performance.now(); });
-  bindSlider("sBrake", "vBrake", v => { P.brake = v; $("vBrake").innerHTML = v + '<span>&times; hitrost</span>'; fdChangeAt = performance.now(); });
+  bindSlider("sBrake", "vBrake", v => { P.brake = v; $("vBrake").innerHTML = v + '<span>&times; stopnja</span>'; fdChangeAt = performance.now(); });
   bindSlider("sDens", "vDens", v => {
     P.density = v; $("vDens").innerHTML = v + '<span>voz/km</span>';
     build();
@@ -824,6 +919,123 @@
   });
 
   // ---------- Go ----------
+  build();
+  requestAnimationFrame(frame);
+})();
+
+
+/* =====================================================================
+   EXPERIMENT 2 — single stopped car on a straight kilometre.
+   Deterministic (no random slowdown): the ONLY cause of a jam is the
+   user clicking a car. Shows the backward-travelling wave persisting
+   long after the offending car has driven on.
+   ===================================================================== */
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const CELL_M = 7.5;              // m per cell
+  const L = 133;                   // ~1 km / 7.5 m
+  const VMAX = 4;                  // ~108 km/h
+  const STOP_STEPS = 6;            // forced-stop duration (s), like a hard brake
+  const STEPS_PER_S = 8;
+
+  const road = $("road"), rx = road.getContext("2d");
+  const rst = $("roadST"), rsx = rst.getContext("2d");
+  const RW = road.width, RH = road.height, SW = rst.width, SH = rst.height;
+
+  let cars = [];                   // {pos, v, stop}
+  let dens = 32;
+  let interacted = false;
+  let acc = 0, last = performance.now();
+
+  const getVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#000";
+  function speedColor(f) {
+    f = Math.max(0, Math.min(1, f));
+    const s = [[255,59,48],[255,180,0],[52,211,153]];
+    const t = f*2, i = Math.min(1, Math.floor(t)), g = t-i, a = s[i], b = s[i+1];
+    return `rgb(${Math.round(a[0]+(b[0]-a[0])*g)},${Math.round(a[1]+(b[1]-a[1])*g)},${Math.round(a[2]+(b[2]-a[2])*g)})`;
+  }
+
+  function build() {
+    const n = Math.max(1, Math.min(L-1, Math.round(dens * L * CELL_M / 1000)));
+    cars = [];
+    for (let i = 0; i < n; i++) cars.push({ pos: Math.floor(i*L/n), v: VMAX, stop: 0 });
+    for (let i = 1; i < cars.length; i++) if (cars[i].pos <= cars[i-1].pos) cars[i].pos = cars[i-1].pos + 1;
+    clearST();
+    $("e2Note").textContent = n + " vozil · 1,0 km";
+  }
+
+  function step() {
+    const n = cars.length; if (!n) return;
+    for (let i = 0; i < n; i++) {
+      const cur = cars[i], ah = cars[(i+1) % n];
+      let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += L;
+      let v;
+      if (cur.stop > 0) { v = 0; cur.stop--; }          // forced hard stop
+      else { v = Math.min(cur.v + 1, VMAX); if (v > gap) v = gap; }  // NO random term
+      cur.nv = v;
+    }
+    for (let i = 0; i < n; i++) { cars[i].v = cars[i].nv; cars[i].pos = (cars[i].pos + cars[i].v) % L; }
+    cars.sort((a, b) => a.pos - b.pos);
+    pushST();
+  }
+
+  function clearST() { rsx.fillStyle = getVar("--bg-grad-2"); rsx.fillRect(0, 0, SW, SH); }
+  function pushST() {
+    rsx.drawImage(rst, 0, 1, SW, SH-1, 0, 0, SW, SH-1);
+    const y = SH-1, sx = SW / L;
+    rsx.fillStyle = getVar("--bg-grad-2"); rsx.fillRect(0, y, SW, 1);
+    for (const c of cars) { rsx.fillStyle = speedColor(c.v/VMAX); rsx.fillRect(Math.floor(c.pos*sx), y, Math.max(1, Math.ceil(sx)), 1); }
+  }
+
+  function draw() {
+    rx.clearRect(0, 0, RW, RH);
+    const laneY = RH/2, laneH = RH*0.52;
+    rx.fillStyle = getVar("--track"); rx.fillRect(0, laneY - laneH/2, RW, laneH);
+    rx.strokeStyle = getVar("--edge"); rx.setLineDash([16, 16]); rx.lineWidth = 2;
+    rx.beginPath(); rx.moveTo(0, laneY); rx.lineTo(RW, laneY); rx.stroke(); rx.setLineDash([]);
+    const sx = RW / L, cw = Math.max(7, sx*0.78), ch = laneH*0.6;
+    for (const c of cars) {
+      const x = c.pos * sx, f = c.v / VMAX, col = speedColor(f);
+      if (c.stop > 0 || f < 0.3) {
+        rx.fillStyle = col.replace("rgb", "rgba").replace(")", ",0.3)");
+        rrect(x-3, laneY - ch/2 - 3, cw+6, ch+6, 6); rx.fill();
+      }
+      rx.fillStyle = col; rrect(x, laneY - ch/2, cw, ch, 3); rx.fill();
+    }
+  }
+  function rrect(x, y, w, h, r) {
+    rx.beginPath();
+    if (rx.roundRect) rx.roundRect(x, y, w, h, r);
+    else rx.rect(x, y, w, h);
+  }
+
+  function stopNearest(clientX) {
+    const rect = road.getBoundingClientRect();
+    const cell = ((clientX - rect.left) / rect.width) * L;
+    let best = -1, bd = 1e9;
+    for (let i = 0; i < cars.length; i++) {
+      let d = Math.abs(cars[i].pos - cell); d = Math.min(d, L - d);
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best >= 0) { cars[best].stop = STOP_STEPS; flash(); }
+  }
+  function flash() { if (!interacted) { interacted = true; const h = $("roadHint"); if (h) h.style.opacity = "0"; } }
+
+  road.addEventListener("click", e => stopNearest(e.clientX));
+  road.addEventListener("touchstart", e => { if (e.touches[0]) { stopNearest(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
+  $("e2Stop").addEventListener("click", () => { if (cars.length) { cars[Math.floor(Math.random()*cars.length)].stop = STOP_STEPS; flash(); } });
+  $("e2Reset").addEventListener("click", build);
+  $("e2Dens").addEventListener("input", e => { dens = +e.target.value; $("e2vDens").innerHTML = dens + '<span>voz/km</span>'; build(); });
+
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    acc += dt * STEPS_PER_S;
+    let s = 0; while (acc >= 1 && s < 20) { step(); acc -= 1; s++; }
+    draw();
+    requestAnimationFrame(frame);
+  }
+
   build();
   requestAnimationFrame(frame);
 })();
