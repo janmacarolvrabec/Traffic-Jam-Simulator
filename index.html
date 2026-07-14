@@ -172,6 +172,12 @@
   .ctrl-val span { font-size: 11px; color: var(--ink-3); font-weight: 600; margin-left: 2px; }
   .ctrl-desc { font-size: 12px; color: var(--ink-3); line-height: 1.45; margin-top: 2px; }
   .ctrl-desc b { color: var(--ink-2); font-weight: 600; }
+  .link-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); cursor: pointer; user-select: none; margin-top: 3px; }
+  .link-toggle input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; flex: none; }
+  .link-toggle b { color: var(--ink); font-weight: 600; }
+  input[type="range"]:disabled { opacity: .45; }
+  input[type="range"]:disabled::-webkit-slider-thumb { background: var(--ink-3); box-shadow: none; }
+  input[type="range"]:disabled::-moz-range-thumb { background: var(--ink-3); box-shadow: none; }
 
   input[type="range"] { width: 100%; height: 22px; background: transparent; }
   input[type="range"]::-webkit-slider-runnable-track { height: 5px; border-radius: 999px; background: var(--edge); }
@@ -417,10 +423,11 @@
           <div class="ctrl">
             <div class="ctrl-top">
               <div><div class="ctrl-name">Verjetnost dogodka</div><div class="ctrl-hint">naključno mikro-zaviranje / nepozornost</div></div>
-              <div class="ctrl-val" id="vProb">10<span>%</span></div>
+              <div class="ctrl-val" id="vProb">11<span>%</span></div>
             </div>
-            <input type="range" id="sProb" min="0" max="50" step="1" value="10">
-            <div class="ctrl-desc">Verjetnost, da voznik v vsaki sekundi brez potrebe malce popusti plin ali zavre. To je <b>vzrok fantomskih zastojev</b>. <b>Realno:</b> ~5&ndash;15 %. Pri <b>0 %</b> promet nikoli ne razpade &mdash; poskusite!</div>
+            <input type="range" id="sProb" min="0" max="50" step="1" value="11" disabled>
+            <label class="link-toggle"><input type="checkbox" id="linkProb" checked> <span>Sklopi s hitrostjo <b>(Nilsson: dogodki &prop; hitrost&sup2;)</b></span></label>
+            <div class="ctrl-desc">Verjetnost, da voznik v vsaki sekundi brez potrebe zavre &mdash; <b>vzrok fantomskih zastojev</b>. Ko je sklopljeno, se samodejno spreminja s hitrostjo po potenčnem modelu: <b>90&nbsp;→&nbsp;5&nbsp;%, 110&nbsp;→&nbsp;8&nbsp;%, 130&nbsp;→&nbsp;11&nbsp;%, 150&nbsp;→&nbsp;15&nbsp;%</b>. Odklenite kljukico za ročno nastavitev.</div>
           </div>
 
           <div class="ctrl">
@@ -573,6 +580,7 @@
       <div class="study"><b>Sugiyama et al. (2008)</b> &mdash; 22 vozil na 230 m krožni progi pri konstantni hitrosti spontano tvori zastoj brez ovire; motnje se ojačajo v val, ki potuje nazaj. <a href="https://iopscience.iop.org/article/10.1088/1367-2630/10/3/033001" target="_blank" rel="noopener">New J. Phys. 10, 033001</a></div>
       <div class="study"><b>Nagel &amp; Schreckenberg (1992)</b> &mdash; celularni avtomat s štirimi pravili (pospešek, varnost, naključno zaviranje z verjetnostjo <i>p</i>, premik); osnova tega simulatorja. <a href="https://hal.science/jpa-00246697/document" target="_blank" rel="noopener">J. Phys. I France 2, 2221</a></div>
       <div class="study"><b>Flynn, Kasimov, Nave, Rosales &amp; Seibold (MIT)</b> &mdash; &raquo;jamitoni&laquo;: fantomski zastoji kot potujoči valovi, ki obstajajo tudi če vsi vozniki upoštevajo enaka pravila. <a href="https://math.mit.edu/traffic/" target="_blank" rel="noopener">math.mit.edu/traffic</a></div>
+      <div class="study"><b>Nilsson (2004) &middot; Elvik (2009) &mdash; potenčni model</b> &mdash; pogostost nesreč raste s potenco hitrosti: nesreče s poškodbami &prop; hitrost&sup2;, hude &prop; hitrost&sup3;, smrtne &prop; hitrost&#8308;. Empirično iz švedskih sprememb omejitev; velja za avtoceste. Osnova sklopitve hitrost&ndash;dogodek v Poskusu 1. <a href="https://www.sciencedirect.com/science/article/abs/pii/S000145751000148X" target="_blank" rel="noopener">Elvik, Accid. Anal. Prev. (2010)</a></div>
     </div>
   </div>
 
@@ -932,12 +940,32 @@
     el.addEventListener("input", () => fn(parseFloat(el.value)));
     fn(parseFloat(el.value));
   }
+  // Speed <-> event-probability coupling, grounded in Nilsson's power model:
+  // casualty-crash frequency scales with the square of speed (exponent ~2;
+  // serious ~3, fatal ~4). Anchored at 130 km/h -> 11%.
+  let linkProb = true;
+  const REF_KMH = 130, P_REF = 11, POW = 2;
+  const speedToProb = kmh => Math.max(0, Math.min(50, Math.round(P_REF * Math.pow(kmh / REF_KMH, POW))));
+  function syncProbFromSpeed() {
+    const pv = speedToProb(parseFloat($("sSpeed").value));
+    $("sProb").value = pv;
+    P.prob = pv / 100;
+    $("vProb").innerHTML = pv + '<span>%</span>';
+    fdChangeAt = performance.now();
+  }
+
   bindSlider("sSpeed", "vSpeed", v => {
     P.vmax = Math.max(1, Math.round(v / KMH_PER_CELL));
     $("vSpeed").innerHTML = v + '<span>km/h</span>';   // show chosen limit directly
     fdChangeAt = performance.now();
+    if (linkProb) syncProbFromSpeed();
   });
   bindSlider("sProb", "vProb", v => { P.prob = v/100; $("vProb").innerHTML = v + '<span>%</span>'; fdChangeAt = performance.now(); });
+  $("linkProb").addEventListener("change", e => {
+    linkProb = e.target.checked;
+    $("sProb").disabled = linkProb;
+    if (linkProb) syncProbFromSpeed();
+  });
   bindSlider("sBrake", "vBrake", v => { P.brake = v; $("vBrake").innerHTML = v + '<span>&times; stopnja</span>'; fdChangeAt = performance.now(); });
   bindSlider("sDens", "vDens", v => {
     P.density = v; $("vDens").innerHTML = v + '<span>voz/km</span>';
