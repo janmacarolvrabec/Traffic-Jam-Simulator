@@ -3,7 +3,28 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Simulator fantomskih zastojev</title>
+<title>Zakaj nastane zastoj iz nič? &middot; Simulator fantomskih zastojev</title>
+<meta name="author" content="Jan Macarol">
+<meta name="description" content="Interaktivni poskus: en avto na hip zavre — in kilometre stran spontano nastane zastoj. Brez nesreče, brez ovire. Preizkusi sam, kdaj promet razpade. Pripravil Jan Macarol.">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp, ...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Simulator fantomskih zastojev">
+<meta property="og:locale" content="sl_SI">
+<meta property="og:url" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/">
+<meta property="og:title" content="Zakaj nastane prometni zastoj iz nič? 🚗">
+<meta property="og:description" content="En sam avto na hip zavre — in kilometre stran spontano nastane zastoj. Brez nesreče, brez ovire. Interaktivni simulator fantomskih zastojev. Preizkusi sam. Pripravil Jan Macarol.">
+<meta property="og:image" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Krožna proga z avtomobili in val zastoja, ki potuje nazaj po cesti.">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Zakaj nastane prometni zastoj iz nič? 🚗">
+<meta name="twitter:description" content="En sam avto na hip zavre — in kilometre stran nastane kolona. Interaktivni simulator fantomskih zastojev. Preizkusi sam.">
+<meta name="twitter:image" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/og-image.png">
+<meta name="theme-color" content="#ffb400">
 <style>
   /* ---- Reset ---- */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -93,6 +114,8 @@
   }
   h1 em { font-style: normal; color: var(--accent); }
   .lede { color: var(--ink-2); max-width: 60ch; font-size: 15px; }
+  .byline { font-size: 12.5px; color: var(--ink-3); letter-spacing: .02em; }
+  .byline b { color: var(--ink-2); font-weight: 600; }
   .theme-btn {
     border: 1px solid var(--edge); border-radius: 999px; padding: 9px 15px;
     font-size: 12px; letter-spacing: .04em; color: var(--ink-2); background: var(--panel);
@@ -195,7 +218,35 @@
   .study a { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
   .study a:hover { border-bottom-color: var(--accent); }
 
+  /* ---- Fundamental diagram ---- */
+  #fdWrap { padding: 6px 18px 18px; }
+  #fd { width: 100%; height: auto; display: block; }
+  .fd-legend { display: flex; gap: 16px; padding: 0 18px 16px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-2); }
+  .fd-legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .fd-swatch { width: 14px; height: 3px; border-radius: 2px; }
+
+  /* ---- Share ---- */
+  .share { display: flex; align-items: center; gap: 12px; padding: 16px 18px; flex-wrap: wrap; }
+  .share-lab { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-right: 2px; }
+  .share-btns { display: flex; gap: 9px; flex-wrap: wrap; }
+  .sbtn {
+    display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--edge);
+    border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 600; color: var(--ink-2);
+    background: var(--panel-2); transition: border-color .16s, color .16s, transform .12s;
+  }
+  .sbtn:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
+  .sbtn svg { width: 16px; height: 16px; fill: currentColor; }
+  .share-note { font-size: 11.5px; color: var(--ink-3); padding: 0 18px 16px; max-width: 70ch; }
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+    background: var(--accent); color: #17130a; font-weight: 700; font-size: 13px;
+    padding: 11px 18px; border-radius: 10px; box-shadow: var(--shadow); opacity: 0;
+    pointer-events: none; transition: opacity .2s, transform .2s; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   footer { margin-top: 26px; text-align: center; font-size: 12px; color: var(--ink-3); }
+  footer b { color: var(--ink-2); font-weight: 600; }
 
   .col { display: flex; flex-direction: column; gap: 18px; }
 
@@ -209,6 +260,7 @@
       <div class="eyebrow">Prometna dinamika &middot; Model Nagel–Schreckenberg</div>
       <h1>Simulator <em>fantomskih</em> zastojev</h1>
       <p class="lede">Zastoj brez ovire. Ena sama previdna zavora se ojača v val, ki potuje <em>nazaj</em> po cesti &mdash; točno kot v Sugiyamovem poskusu s krožno progo. Nastavite parametre in opazujte, kdaj promet razpade.</p>
+      <p class="byline">Poskus pripravil <b>Jan Macarol</b></p>
     </div>
     <button class="theme-btn" id="themeBtn" aria-label="Preklopi temo"><span id="themeIcon">&#9788;</span> <span id="themeTxt">Svetla tema</span></button>
   </header>
@@ -312,8 +364,22 @@
     </div>
   </div>
 
+  <!-- FUNDAMENTAL DIAGRAM -->
+  <div class="card" style="margin-top:18px">
+    <div class="card-head">
+      <span class="card-title">Temeljni diagram &middot; pretok proti gostoti</span>
+      <span class="card-note">krivulja za trenutne parametre; točka je vaše stanje v živo</span>
+    </div>
+    <div id="fdWrap"><canvas id="fd" width="960" height="340"></canvas></div>
+    <div class="fd-legend">
+      <span><span class="fd-swatch" style="background:var(--accent)"></span>zmogljivost krivulje</span>
+      <span><span class="fd-swatch" style="background:var(--flow);height:10px;width:10px;border-radius:50%"></span>trenutno stanje (v živo)</span>
+      <span><span class="fd-swatch" style="background:var(--jam);height:10px;width:2px"></span>kritična gostota (vrh)</span>
+    </div>
+  </div>
+
   <!-- EXPLAIN -->
-  <div class="card explain">
+  <div class="card explain" style="margin-top:18px">
     <div class="card-head"><span class="card-title">Kako nastane fantomski zastoj</span></div>
     <div class="explain-grid">
       <div class="ex-item">
@@ -336,7 +402,24 @@
     </div>
   </div>
 
-  <footer>Model: Nagel–Schreckenberg (celularni avtomat) &middot; celica 7,5 m &middot; korak 1 s &middot; obroč 3,0 km z zaprto zanko</footer>
+  <!-- SHARE -->
+  <div class="card" style="margin-top:18px">
+    <div class="card-head"><span class="card-title">Deli poskus</span><span class="card-note">razširi med prijatelje in kolege</span></div>
+    <div class="share">
+      <span class="share-lab">Deli na</span>
+      <div class="share-btns">
+        <button class="sbtn" id="shFb" aria-label="Deli na Facebooku"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>Facebook</button>
+        <button class="sbtn" id="shX" aria-label="Deli na X"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.1 8.1L23 22h-6.6l-5.2-6.8L5.3 22H2.1l7.6-8.7L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.1 3.9H5.2L17.7 20Z"/></svg>X</button>
+        <button class="sbtn" id="shLi" aria-label="Deli na LinkedInu"><svg viewBox="0 0 24 24"><path d="M20.4 3H3.6A.6.6 0 0 0 3 3.6v16.8a.6.6 0 0 0 .6.6h16.8a.6.6 0 0 0 .6-.6V3.6a.6.6 0 0 0-.6-.6ZM8.3 18.3H5.6V9.7h2.7v8.6ZM7 8.5a1.6 1.6 0 1 1 0-3.1 1.6 1.6 0 0 1 0 3.1Zm11.3 9.8h-2.7v-4.2c0-1 0-2.3-1.4-2.3s-1.6 1.1-1.6 2.2v4.3h-2.7V9.7h2.6v1.2h.1a2.9 2.9 0 0 1 2.6-1.4c2.8 0 3.3 1.8 3.3 4.2v4.6Z"/></svg>LinkedIn</button>
+        <button class="sbtn" id="shWa" aria-label="Deli na WhatsAppu"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm5.8 14.1c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5-4.5-.2-.2-1.3-1.7-1.3-3.3s.8-2.3 1.1-2.6c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .7.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.4.1.1.1.7-.1 1.4Z"/></svg>WhatsApp</button>
+        <button class="sbtn" id="shCopy" aria-label="Kopiraj povezavo"><svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"/></svg>Kopiraj povezavo</button>
+      </div>
+    </div>
+    <p class="share-note" id="shareNote">Povezava za deljenje se pripravi samodejno. Za lepo predogledno sličico (naslov + slika) na Facebooku in X objavite datoteko na spletu (npr. GitHub Pages) &mdash; oznake Open Graph in slika <code>og-image.png</code> so že vključene.</p>
+  </div>
+
+  <footer>Poskus pripravil <b>Jan Macarol</b> &middot; Model: Nagel–Schreckenberg (celularni avtomat) &middot; celica 7,5 m &middot; korak 1 s &middot; obroč 3,0 km z zaprto zanko</footer>
+  <div class="toast" id="toast">Povezava kopirana</div>
 </div>
 
 <script>
@@ -367,6 +450,11 @@
   const track = $("track"), tctx = track.getContext("2d");
   const st = $("spacetime"), sctx = st.getContext("2d");
   const stW = st.width, stH = st.height;
+  const fd = $("fd"), fctx = fd.getContext("2d");
+  const fdW = fd.width, fdH = fd.height;
+  let fdPts = [];            // {d, q} sampled fundamental-diagram curve
+  let fdCrit = { d:0, q:0 }; // peak (critical density / capacity)
+  let fdChangeAt = 1;        // debounce marker; 1 = compute on first frame
 
   // ---------- Colour ramp: jam(red) -> mid(amber) -> flow(green) ----------
   function speedColor(frac) {
@@ -526,6 +614,110 @@
     }
   }
 
+  // ---------- Fundamental diagram ----------
+  // Sweep density across the whole range with the CURRENT speed/prob/brake,
+  // running a short fresh simulation at each point. Independent of live state.
+  function computeFD() {
+    const pts = [];
+    const jamDens = 1000 / CELL_M;             // ~133 veh/km (bumper to bumper)
+    for (let d = 2; d <= jamDens; d += 2.5) {
+      const n = Math.max(1, Math.min(ROAD_CELLS - 1, Math.round(d * ROAD_KM)));
+      const a = new Array(n);
+      for (let i = 0; i < n; i++) a[i] = { pos: Math.floor(i * ROAD_CELLS / n), v: P.vmax, nv: 0 };
+      let sum = 0, cnt = 0;
+      for (let s = 0; s < 320; s++) {
+        for (let i = 0; i < n; i++) {
+          const cur = a[i], ah = a[(i + 1) % n];
+          let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += ROAD_CELLS;
+          let v = Math.min(cur.v + 1, P.vmax);
+          if (v > gap) v = gap;
+          if (v > 0 && Math.random() < P.prob) v = Math.max(v - P.brake, 0);
+          cur.nv = v;
+        }
+        let vs = 0;
+        for (let i = 0; i < n; i++) { a[i].v = a[i].nv; a[i].pos = (a[i].pos + a[i].v) % ROAD_CELLS; vs += a[i].v; }
+        a.sort((x, y) => x.pos - y.pos);
+        if (s >= 170) { sum += vs; cnt++; }     // average after warm-up
+      }
+      const meanV = sum / cnt / n;
+      const realD = n / ROAD_KM;
+      pts.push({ d: realD, q: realD * meanV * KMH_PER_CELL });
+    }
+    fdPts = pts;
+    fdCrit = pts.reduce((m, p) => p.q > m.q ? p : m, { d: 0, q: 0 });
+  }
+
+  function drawFD(liveD, liveQ) {
+    const W = fdW, H = fdH;
+    fctx.clearRect(0, 0, W, H);
+    const padL = 62, padR = 18, padT = 18, padB = 40;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const maxD = 1000 / CELL_M;
+    const maxQ = Math.max(fdCrit.q * 1.15, 400);
+    const X = d => padL + (d / maxD) * plotW;
+    const Y = q => padT + plotH - (q / maxQ) * plotH;
+    const ink3 = getVar("--ink-3"), edge = getVar("--edge-soft"), accent = getVar("--accent");
+    fctx.font = "11px system-ui, sans-serif";
+    fctx.textBaseline = "middle";
+
+    // grid + y labels (flow)
+    fctx.strokeStyle = edge; fctx.fillStyle = ink3; fctx.lineWidth = 1;
+    const qStep = maxQ > 1800 ? 500 : 250;
+    for (let q = 0; q <= maxQ; q += qStep) {
+      const y = Y(q);
+      fctx.globalAlpha = .5; fctx.beginPath(); fctx.moveTo(padL, y); fctx.lineTo(W - padR, y); fctx.stroke();
+      fctx.globalAlpha = 1; fctx.textAlign = "right"; fctx.fillText(q.toLocaleString("sl"), padL - 8, y);
+    }
+    // x labels (density)
+    fctx.textAlign = "center";
+    for (let d = 0; d <= maxD; d += 20) {
+      const x = X(d);
+      fctx.fillText(String(Math.round(d)), x, H - padB + 16);
+    }
+    // axis titles
+    fctx.fillStyle = ink3;
+    fctx.fillText("gostota (vozil/km)", padL + plotW / 2, H - 8);
+    fctx.save(); fctx.translate(16, padT + plotH / 2); fctx.rotate(-Math.PI / 2);
+    fctx.fillText("pretok (vozil/h)", 0, 0); fctx.restore();
+
+    if (fdPts.length) {
+      // area fill under curve, coloured by speed regime
+      const grad = fctx.createLinearGradient(padL, 0, W - padR, 0);
+      grad.addColorStop(0, "rgba(52,211,153,.16)");
+      grad.addColorStop(fdCrit.d / maxD, "rgba(255,180,0,.16)");
+      grad.addColorStop(1, "rgba(255,59,48,.16)");
+      fctx.beginPath();
+      fctx.moveTo(X(fdPts[0].d), Y(0));
+      for (const p of fdPts) fctx.lineTo(X(p.d), Y(p.q));
+      fctx.lineTo(X(fdPts[fdPts.length - 1].d), Y(0));
+      fctx.closePath(); fctx.fillStyle = grad; fctx.fill();
+
+      // critical-density marker (vertical line at the peak)
+      fctx.strokeStyle = getVar("--jam"); fctx.globalAlpha = .55; fctx.setLineDash([3, 4]);
+      fctx.beginPath(); fctx.moveTo(X(fdCrit.d), Y(0)); fctx.lineTo(X(fdCrit.d), Y(fdCrit.q)); fctx.stroke();
+      fctx.setLineDash([]); fctx.globalAlpha = 1;
+
+      // the curve
+      fctx.beginPath();
+      fdPts.forEach((p, i) => i ? fctx.lineTo(X(p.d), Y(p.q)) : fctx.moveTo(X(p.d), Y(p.q)));
+      fctx.strokeStyle = accent; fctx.lineWidth = 2.5; fctx.lineJoin = "round"; fctx.stroke();
+
+      // capacity label
+      fctx.fillStyle = getVar("--ink-2"); fctx.textAlign = "center";
+      fctx.fillText("zmogljivost ≈ " + Math.round(fdCrit.q).toLocaleString("sl") + " voz/h", X(fdCrit.d), Y(fdCrit.q) - 12);
+    }
+
+    // live operating point
+    if (liveD != null) {
+      const x = X(liveD), y = Y(Math.max(0, liveQ));
+      fctx.beginPath(); fctx.arc(x, y, 9, 0, Math.PI * 2);
+      fctx.fillStyle = "rgba(52,211,153,.22)"; fctx.fill();
+      fctx.beginPath(); fctx.arc(x, y, 5, 0, Math.PI * 2);
+      fctx.fillStyle = getVar("--flow"); fctx.fill();
+      fctx.lineWidth = 2; fctx.strokeStyle = getVar("--panel"); fctx.stroke();
+    }
+  }
+
   // ---------- Helpers ----------
   function getVar(name) {
     return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#000";
@@ -542,6 +734,9 @@
     }
     drawTrack();
     const m = metrics();
+    // recompute the fundamental-diagram curve shortly after params settle
+    if (fdChangeAt && now - fdChangeAt > 130) { computeFD(); fdChangeAt = 0; }
+    drawFD(P.density, m.flow);
     $("ctrSpeed").textContent = Math.round(m.speed);
     $("ctrSub").textContent = "t = " + t + " s";
     $("mSpeed").innerHTML = Math.round(m.speed) + '<span class="m-unit">km/h</span>';
@@ -560,9 +755,10 @@
   bindSlider("sSpeed", "vSpeed", v => {
     P.vmax = Math.round(v / KMH_PER_CELL);
     $("vSpeed").innerHTML = Math.round(P.vmax * KMH_PER_CELL) + '<span>km/h</span>';
+    fdChangeAt = performance.now();
   });
-  bindSlider("sProb", "vProb", v => { P.prob = v/100; $("vProb").innerHTML = v + '<span>%</span>'; });
-  bindSlider("sBrake", "vBrake", v => { P.brake = v; $("vBrake").innerHTML = v + '<span>&times; hitrost</span>'; });
+  bindSlider("sProb", "vProb", v => { P.prob = v/100; $("vProb").innerHTML = v + '<span>%</span>'; fdChangeAt = performance.now(); });
+  bindSlider("sBrake", "vBrake", v => { P.brake = v; $("vBrake").innerHTML = v + '<span>&times; hitrost</span>'; fdChangeAt = performance.now(); });
   bindSlider("sDens", "vDens", v => {
     P.density = v; $("vDens").innerHTML = v + '<span>voz/km</span>';
     build();
@@ -590,6 +786,25 @@
     clearSpacetime();
   });
   applyThemeLabel();
+
+  // ---------- Share ----------
+  const DEFAULT_URL = "https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/";
+  // when served over http(s) share the live URL; for local file:// fall back to the published one
+  const SHARE_URL = /^https?:$/.test(location.protocol) ? location.href.split(/[?#]/)[0] : DEFAULT_URL;
+  const SHARE_TEXT = "Zakaj nastane prometni zastoj iz nič? 🚗 En avto na hip zavre — in kilometre stran nastane kolona. Interaktivni simulator fantomskih zastojev (pripravil Jan Macarol):";
+  const enc = encodeURIComponent;
+  function pop(url) { window.open(url, "_blank", "noopener,noreferrer,width=620,height=560"); }
+  $("shFb").addEventListener("click", () => pop("https://www.facebook.com/sharer/sharer.php?u=" + enc(SHARE_URL)));
+  $("shX").addEventListener("click", () => pop("https://twitter.com/intent/tweet?text=" + enc(SHARE_TEXT) + "&url=" + enc(SHARE_URL)));
+  $("shLi").addEventListener("click", () => pop("https://www.linkedin.com/sharing/share-offsite/?url=" + enc(SHARE_URL)));
+  $("shWa").addEventListener("click", () => pop("https://wa.me/?text=" + enc(SHARE_TEXT + " " + SHARE_URL)));
+  const toast = $("toast");
+  let toastT;
+  function showToast(msg) { toast.textContent = msg; toast.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove("show"), 1900); }
+  $("shCopy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(SHARE_URL); showToast("Povezava kopirana ✓"); }
+    catch { showToast(SHARE_URL); }
+  });
 
   // ---------- Go ----------
   build();

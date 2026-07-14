@@ -2,6 +2,8 @@
 
 Interaktivni simulator **fantomskih zastojev** (angl. *phantom traffic jams*) — zastojev, ki nastanejo brez vsakršne ovire, zgolj iz drobnih motenj v vožnji, ki se ojačajo v val, ki potuje nazaj po cesti.
 
+Poskus pripravil **Jan Macarol**.
+
 Odprite [`index.html`](index.html) v brskalniku. Datoteka je samostojna (brez zunanjih odvisnosti).
 
 ## Parametri
@@ -30,7 +32,14 @@ Vozila krožijo po zaprti zanki (obroč 3,0 km), enako kot v znamenitem Sugiyamo
 
 - **Krožna proga** — vozila kot točke, obarvana po hitrosti (rdeča = ustavljeno → zelena = prost tok).
 - **Prostorsko-časovni diagram** — vsaka vrstica je en časovni korak; temne diagonale, ki potujejo v levo, so valovi zastoja, ki se pomikajo nazaj skozi kolono.
+- **Temeljni diagram (pretok–gostota)** — krivulja za trenutne parametre z označeno *kritično gostoto* (vrhom zmogljivosti) in točko trenutnega stanja v živo. Pokaže, da čez kritično gostoto pretok pade, čeprav vozil dodajamo.
 - **Meritve v živo** — povprečna hitrost, pretok (vozil/h), število zastojev, delež ustavljenih vozil.
+
+## Deljenje na družbenih omrežjih
+
+Datoteka vsebuje oznake **Open Graph** in **Twitter Card** ter gumbe za deljenje na Facebook, X, LinkedIn in WhatsApp. Priložena je predogledna slika `og-image.png` (1200×630).
+
+Za lepe predoglede (naslov + slika) pri deljenju objavite stran na spletu, npr. prek **GitHub Pages**: v nastavitvah repozitorija vklopite Pages z veje, nato bo dostopna na `https://<uporabnik>.github.io/Traffic-Jam-Simulator/`. Oznake `og:url` / `og:image` v `index.html` že kažejo na ta naslov (po potrebi prilagodite uporabniško ime).
 
 ## Študije v ozadju
 
