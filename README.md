@@ -62,6 +62,16 @@ Vozila krožijo po zaprti zanki (obroč 3,0 km), enako kot v znamenitem Sugiyamo
 - **Temeljni diagram (pretok–gostota)** — krivulja za trenutne parametre z označeno *kritično gostoto* (vrhom zmogljivosti) in točko trenutnega stanja v živo. Pokaže, da čez kritično gostoto pretok pade, čeprav vozil dodajamo.
 - **Meritve v živo** — povprečna hitrost, pretok (vozil/h), število zastojev, delež ustavljenih vozil.
 
+## Razsodba: kdo je kriv za fantomski zastoj?
+
+Simulator se sklene z razsodbo, ki poveže vse tri poskuse:
+
+- **Voznik, ki je zaviral** (Poskus 2) — *sprožilec, ne krivec*: iskra, ne vzrok.
+- **Gostota prometa** (Poskus 1) — *sokrivec*: šele nad kritično gostoto postane tok nestabilen.
+- **Previsoka hitrost** (Poskus 3) — *oteževalna okoliščina*: zastoja ne povzroči, a močno poveča tveganje.
+
+**Pravi krivec** ni posamezen voznik, ampak **človeški reakcijski čas v gostem prometu** — fantomski zastoj nastane iz kolektivne dinamike. Nihče posamič, vsi skupaj. Zato pomagata umirjena, nižja hitrost in večji razmik.
+
 ## Deljenje na družbenih omrežjih
 
 Datoteka vsebuje oznake **Open Graph** in **Twitter Card** ter gumbe za deljenje na Facebook, X, LinkedIn in WhatsApp. Priložena je predogledna slika `og-image.png` (1200×630).

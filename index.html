@@ -3,26 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Zakaj nastane zastoj iz nič? &middot; Simulator fantomskih zastojev</title>
+<title>Kdo je kriv za fantomski zastoj? &middot; Simulator (3 poskusi)</title>
 <meta name="author" content="Jan Macarol">
-<meta name="description" content="Interaktivni poskus: en avto na hip zavre — in kilometre stran spontano nastane zastoj. Brez nesreče, brez ovire. Preizkusi sam, kdaj promet razpade. Pripravil Jan Macarol.">
+<meta name="description" content="Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije interaktivni poskusi razkrijejo, kdo je v resnici kriv za fantomski zastoj. Pripravil Jan Macarol.">
 
 <!-- Open Graph (Facebook, LinkedIn, WhatsApp, ...) -->
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Simulator fantomskih zastojev">
 <meta property="og:locale" content="sl_SI">
 <meta property="og:url" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/">
-<meta property="og:title" content="Zakaj nastane prometni zastoj iz nič? 🚗">
-<meta property="og:description" content="En sam avto na hip zavre — in kilometre stran spontano nastane zastoj. Brez nesreče, brez ovire. Interaktivni simulator fantomskih zastojev. Preizkusi sam. Pripravil Jan Macarol.">
+<meta property="og:title" content="Kdo je kriv za fantomski zastoj? 🕵️">
+<meta property="og:description" content="Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije interaktivni poskusi razkrijejo krivca, in ni tam, kjer bi pričakovali. Preizkusi sam. Pripravil Jan Macarol.">
 <meta property="og:image" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Krožna proga z avtomobili in val zastoja, ki potuje nazaj po cesti.">
+<meta property="og:image:alt" content="Krožna proga z avtomobili in povečevalno steklo nad enim vozilom — kdo je kriv za zastoj?">
 
 <!-- Twitter / X -->
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Zakaj nastane prometni zastoj iz nič? 🚗">
-<meta name="twitter:description" content="En sam avto na hip zavre — in kilometre stran nastane kolona. Interaktivni simulator fantomskih zastojev. Preizkusi sam.">
+<meta name="twitter:title" content="Kdo je kriv za fantomski zastoj? 🕵️">
+<meta name="twitter:description" content="Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije poskusi razkrijejo krivca. Preizkusi sam.">
 <meta name="twitter:image" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/og-image.png">
 <meta name="theme-color" content="#ffb400">
 <style>
@@ -358,6 +358,22 @@
     transition: border-color .16s, color .16s, transform .12s; }
   .soc:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
   .soc svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ---- Verdict: who is to blame ---- */
+  .suspects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px 18px 6px; }
+  @media (max-width: 760px) { .suspects { grid-template-columns: 1fr; } }
+  .suspect { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 12px; padding: 15px 16px; }
+  .susp-tag { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 800; color: var(--ink-3); }
+  .susp-name { font-size: 16px; font-weight: 800; margin: 6px 0 9px; letter-spacing: -.01em; }
+  .susp-verdict { display: inline-block; font-size: 11.5px; font-weight: 800; padding: 4px 11px; border-radius: 999px; margin-bottom: 10px; }
+  .susp-verdict.cleared { color: var(--flow); background: color-mix(in srgb, var(--flow) 16%, transparent); border: 1px solid var(--flow); }
+  .susp-verdict.accomplice { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); border: 1px solid var(--accent); }
+  .susp-verdict.aggravating { color: var(--jam); background: color-mix(in srgb, var(--jam) 14%, transparent); border: 1px solid var(--jam); }
+  .suspect p { font-size: 13px; color: var(--ink-2); line-height: 1.46; }
+  .final-verdict { margin: 12px 18px 20px; padding: 17px 19px; }
+  .final-verdict .fv-q { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 7px; }
+  .final-verdict .fv-a { font-size: 15px; line-height: 1.55; color: var(--ink); }
+  .final-verdict .fv-a b { color: var(--accent); font-weight: 700; }
 
   /* ---- Methodology disclaimer ---- */
   .disclaimer { font-size: 12.5px; line-height: 1.55; color: var(--ink-2);
@@ -698,6 +714,40 @@
       <div class="study"><b>Nagel &amp; Schreckenberg (1992)</b> &mdash; <i>računski model vseh treh poskusov.</i> Celularni avtomat s štirimi pravili na korak: (1) pospešek, (2) varnostno zaviranje na razmik, (3) naključno zaviranje z verjetnostjo <i>p</i>, (4) premik. Celica 7,5 m, korak 1 s. <a href="https://hal.science/jpa-00246697/document" target="_blank" rel="noopener">J. Phys. I France 2, 2221</a></div>
       <div class="study"><b>Nilsson (2004) &middot; Elvik (2009) &mdash; potenčni model</b> &mdash; <i>osnova sklopitve hitrost&ndash;dogodek in varnostne table.</i> Pogostost nesreč raste s potenco hitrosti: poškodbe &prop; v&sup2; (eksponent 2), hude &prop; v&sup3;, smrtne &prop; v&#8308;. Empirično iz švedskih sprememb omejitev, velja za avtoceste. Uporabljena razmerja: (130/110)&sup2; = <b>1,40</b>, (130/110)&#8308; = <b>1,95</b>. <a href="https://www.sciencedirect.com/science/article/abs/pii/S000145751000148X" target="_blank" rel="noopener">Elvik, Accid. Anal. Prev. (2010)</a></div>
       <div class="study"><b>Flynn, Kasimov, Nave, Rosales &amp; Seibold (MIT)</b> &mdash; teoretična potrditev: &raquo;jamitoni&laquo; so potujoči valovi zastoja, ki nastanejo tudi ko vsi vozniki upoštevajo povsem enaka pravila. <a href="https://math.mit.edu/traffic/" target="_blank" rel="noopener">math.mit.edu/traffic</a></div>
+    </div>
+  </div>
+
+  <!-- VERDICT: who is to blame -->
+  <div class="section-label" style="margin-top:34px">
+    <span class="sl-num">Razsodba</span>
+    <h2>Kdo je torej kriv?</h2>
+    <span class="sl-sub">trije osumljenci, trije poskusi</span>
+  </div>
+
+  <div class="card">
+    <div class="suspects">
+      <div class="suspect">
+        <div class="susp-tag">Osumljenec 1 &middot; Poskus 2</div>
+        <div class="susp-name">Voznik, ki je zaviral</div>
+        <div class="susp-verdict cleared">Sprožilec, ne krivec</div>
+        <p>En sam voznik res sproži kolono. A pri gostem prometu bi jo prej ali slej sprožil kdorkoli &mdash; zaviranje je le iskra, ne pravi vzrok.</p>
+      </div>
+      <div class="suspect">
+        <div class="susp-tag">Osumljenec 2 &middot; Poskus 1</div>
+        <div class="susp-name">Gostota prometa</div>
+        <div class="susp-verdict accomplice">Sokrivec</div>
+        <p>Nad kritično gostoto postane prosti tok nestabilen. Šele gneča omogoči, da se drobna motnja ojači v val. Brez nje zastoja ni.</p>
+      </div>
+      <div class="suspect">
+        <div class="susp-tag">Osumljenec 3 &middot; Poskus 3</div>
+        <div class="susp-name">Previsoka hitrost</div>
+        <div class="susp-verdict aggravating">Oteževalna okoliščina</div>
+        <p>Hitrost sama zastoja ne povzroči (pretok 110 &asymp; 130), a po Nilssonu močno poveča tveganje in ostrino dogodkov &mdash; +40 % nesreč.</p>
+      </div>
+    </div>
+    <div class="verdict final-verdict">
+      <div class="fv-q">Razsodba</div>
+      <div class="fv-a">Pravi krivec ni posamezen voznik, ampak <b>človeški reakcijski čas v gostem prometu</b>. Fantomski zastoj nastane iz <b>kolektivne dinamike</b>: vsak od nas z majhnim zamikom in kančkom prevelikega zaviranja doda svoj kamenček. <b>Nihče posamič &mdash; vsi skupaj.</b> Zato ne pomaga iskanje krivca, ampak umirjena, nižja hitrost in večji razmik.</div>
     </div>
   </div>
 
@@ -1116,7 +1166,7 @@
   const DEFAULT_URL = "https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/";
   // when served over http(s) share the live URL; for local file:// fall back to the published one
   const SHARE_URL = /^https?:$/.test(location.protocol) ? location.href.split(/[?#]/)[0] : DEFAULT_URL;
-  const SHARE_TEXT = "Zakaj nastane prometni zastoj iz nič? 🚗 En avto na hip zavre — in kilometre stran nastane kolona. Interaktivni simulator fantomskih zastojev (pripravil Jan Macarol):";
+  const SHARE_TEXT = "Kdo je kriv za fantomski zastoj? 🕵️ Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije poskusi razkrijejo krivca (pripravil Jan Macarol):";
   const enc = encodeURIComponent;
   // show the actual project link (live URL when hosted, else the published one)
   $("projectUrl").href = SHARE_URL;
