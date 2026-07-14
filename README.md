@@ -8,8 +8,13 @@ Simulator ponuja **dva poskusa**:
 
 1. **Krožna proga** — vozila krožijo v zaprti zanki (à la Sugiyama, 2008). Fantomski zastoji nastanejo spontano iz naključnih mikro-zaviranj. Nastavljivi parametri: hitrost, verjetnost dogodka, jakost zaviranja, gostota.
 2. **En avto zavre** — raven kilometer ceste **brez naključnih motenj**. S klikom ustavite eno vozilo in opazujete, kako za njim nastane trajna kolona, ki potuje nazaj po cesti — tudi ko vaše vozilo že odpelje naprej.
+3. **110 proti 130** — A/B primerjava dveh enakih cest z isto gostoto, kjer se spremeni le omejitev hitrosti. Verjetnost dogodka **raste s hitrostjo** (`p ∝ v`): v enakem reakcijskem času (~1 s) pri 130 km/h prevozite več metrov, zato je manj rezerve in več dogodkov. Simulator sproti meri **potovalno hitrost, delež časa v koloni in dogodke na 100 km** za obe omejitvi.
 
 Privzete vrednosti so umerjene na **realni slovenski avtocestni promet** (omejitev 130 km/h, ~10 % nepozornost, gost promet 30 voz/km → zmogljivost pasu ~2400 voz/h, kar ustreza literaturi 2000–2400 voz/h/pas).
+
+### Ugotovitev Poskusa 3 (110 vs 130)
+
+Iz izmerjenih podatkov modela (z verjetnostjo dogodka, odvisno od hitrosti, in počasnim speljevanjem, ki ustreza zlomu pretoka na avtocestah): pri gostem prometu je **potovalna hitrost pri 110 in 130 praktično enaka**, a pri 130 km/h voznik preživi **več časa v koloni (stop-and-go)** in doživi **več dogodkov na 100 km**. Ker višja omejitev v gneči ne prihrani časa, a poveča tveganje in nemirnost prometa, je **nižja omejitev smiselna**. To je ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah.
 
 Odprite [`index.html`](index.html) v brskalniku. Datoteka je samostojna (brez zunanjih odvisnosti).
 

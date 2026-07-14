@@ -241,6 +241,25 @@
   .e2-controls { display: flex; align-items: flex-end; gap: 14px; padding: 6px 18px 14px; flex-wrap: wrap; }
   .e2-controls .btn { flex: none; }
 
+  /* ---- Experiment 3: A/B 110 vs 130 ---- */
+  .ab { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 14px 18px 6px; }
+  .lane-block { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 12px; padding: 13px 15px; }
+  .lane-title { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .lane-badge { font-size: 13px; font-weight: 800; padding: 4px 13px; border-radius: 999px; letter-spacing: .02em; }
+  .b110 { background: color-mix(in srgb, var(--flow) 20%, transparent); color: var(--flow); border: 1px solid var(--flow); }
+  .b130 { background: color-mix(in srgb, var(--jam) 18%, transparent); color: var(--jam); border: 1px solid var(--jam); }
+  .lane-sub { font-size: 11.5px; color: var(--ink-3); }
+  #road110, #road130 { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .lane-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 11px; }
+  .ls { text-align: center; }
+  .ls-v { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .ls-v small { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+  .ls-l { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-top: 5px; }
+  .ls-bad { color: var(--jam); }
+  .verdict { margin: 12px 18px; padding: 15px 17px; border-radius: 12px; border: 1px solid var(--accent);
+    background: color-mix(in srgb, var(--accent) 9%, transparent); font-size: 14px; line-height: 1.5; color: var(--ink); }
+  .verdict b { color: var(--accent); font-weight: 700; }
+
   /* ---- Share ---- */
   .share { display: flex; align-items: center; gap: 12px; padding: 16px 18px; flex-wrap: wrap; }
   .share-lab { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-right: 2px; }
@@ -277,8 +296,8 @@
   .col { display: flex; flex-direction: column; gap: 18px; }
 
   /* ---- Experiment guide ---- */
-  .guide { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 26px; }
-  @media (max-width: 760px) { .guide { grid-template-columns: 1fr; } }
+  .guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+  @media (max-width: 860px) { .guide { grid-template-columns: 1fr; } }
   .guide .card { padding: 18px 20px; display: flex; flex-direction: column; gap: 9px; }
   .g-tag { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; color: var(--accent); }
   .g-title { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
@@ -321,6 +340,12 @@
       <span class="g-title">En avto zavre</span>
       <p class="g-desc">Raven kilometer ceste brez naključnih motenj &mdash; promet bi tekel v nedogled. Dokler ne posežete vmes vi.</p>
       <span class="g-how"><span><b>Kaj storiti:</b> <b>kliknite na vozilo</b>, da ga za trenutek ustavite. Za njim nastane kolona, ki ostane in potuje nazaj &mdash; tudi ko vaše vozilo že odpelje.</span></span>
+    </div>
+    <div class="card">
+      <span class="g-tag">Poskus 3</span>
+      <span class="g-title">110 proti 130</span>
+      <p class="g-desc">Dve enaki cesti, ista gostota &mdash; le omejitev je drugačna. Verjetnost dogodka raste s hitrostjo, kot v resnici: pri 130 v enakem reakcijskem času prevozite več metrov.</p>
+      <span class="g-how"><span><b>Kaj opazovati:</b> potovalna hitrost je skoraj enaka, a pri 130 je <b>več dogodkov in več stop-and-go</b>. Dokaz, zakaj je nižja omejitev smiselna.</span></span>
     </div>
   </div>
 
@@ -479,6 +504,52 @@
       <button class="btn" id="e2Reset">&#8635; Ponastavi</button>
     </div>
     <p class="share-note">Tu ni naključnih dogodkov (verjetnost je 0 %), zato bi promet tekel v nedogled &mdash; edini vzrok kolone je vaš klik. Opazujte: val zastoja potuje <b>nazaj</b> po cesti pri ~15 km/h in ostane, čeprav vaše vozilo že dolgo vozi naprej. Prav to se dogaja na avtocesti, ko en voznik sunkovito zavre.</p>
+  </div>
+
+  <!-- EXPERIMENT 3: 110 vs 130 A/B -->
+  <div class="section-label">
+    <span class="sl-num">Poskus 3</span>
+    <h2>Zakaj 110 namesto 130</h2>
+    <span class="sl-sub">enaka cesta, enaka gostota &middot; spremeni se le omejitev &middot; verjetnost dogodka raste s hitrostjo</span>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">A/B primerjava &middot; učinek reakcijskega časa</span>
+      <span class="card-note" id="e3Note">&mdash;</span>
+    </div>
+    <div class="ab">
+      <div class="lane-block">
+        <div class="lane-title"><span class="lane-badge b110">110 km/h</span><span class="lane-sub">nižja omejitev</span></div>
+        <canvas id="road110" width="1000" height="64"></canvas>
+        <div class="lane-stats">
+          <div class="ls"><div class="ls-v" id="s110speed">&ndash;</div><div class="ls-l">potovalna hitrost</div></div>
+          <div class="ls"><div class="ls-v" id="s110jam">&ndash;</div><div class="ls-l">% časa v koloni</div></div>
+          <div class="ls"><div class="ls-v" id="s110ev">&ndash;</div><div class="ls-l">dogodki / 100 km</div></div>
+        </div>
+      </div>
+      <div class="lane-block">
+        <div class="lane-title"><span class="lane-badge b130">130 km/h</span><span class="lane-sub">višja omejitev</span></div>
+        <canvas id="road130" width="1000" height="64"></canvas>
+        <div class="lane-stats">
+          <div class="ls"><div class="ls-v" id="s130speed">&ndash;</div><div class="ls-l">potovalna hitrost</div></div>
+          <div class="ls"><div class="ls-v" id="s130jam">&ndash;</div><div class="ls-l">% časa v koloni</div></div>
+          <div class="ls"><div class="ls-v" id="s130ev">&ndash;</div><div class="ls-l">dogodki / 100 km</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="verdict" id="e3Verdict">Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)</div>
+    <div class="e2-controls">
+      <div class="ctrl" style="flex:1; min-width:220px">
+        <div class="ctrl-top">
+          <div class="ctrl-name">Gostota prometa (obe cesti)</div>
+          <div class="ctrl-val" id="e3vDens">22<span>voz/km</span></div>
+        </div>
+        <input type="range" id="e3Dens" min="12" max="45" step="1" value="22">
+      </div>
+      <button class="btn" id="e3Reset">&#8635; Ponastavi meritve</button>
+    </div>
+    <p class="share-note">Verjetnost dogodka tu <b>raste s hitrostjo</b> (p &prop; v): v enakem reakcijskem času (~1 s) pri 130 prevozite več metrov &mdash; manj rezerve, več dogodkov. Po nekaj sekundah merjenja se pokaže: <b>potovalna hitrost je skoraj enaka</b>, a pri 130 preživite <b>več časa v koloni</b> in doživite <b>več dogodkov</b>. Enak čas prihoda, večje tveganje &mdash; zato je nižja omejitev smiselna. (Model dodatno vključuje počasno speljevanje iz zastoja, kar ustreza zlomu pretoka na realnih avtocestah.)</p>
   </div>
 
   <!-- EXPLAIN -->
@@ -1037,6 +1108,140 @@
   }
 
   build();
+  requestAnimationFrame(frame);
+})();
+
+
+/* =====================================================================
+   EXPERIMENT 3 — 110 vs 130 km/h, A/B on identical roads.
+   The ONLY difference is the speed limit. Event probability grows with
+   speed  p(v) = K*v  (in a fixed reaction time you cover v*tau metres, so
+   faster => less margin => more events). Slow-to-start enables the flow
+   breakdown seen on real motorways. We measure realised travel speed,
+   time spent in stop-and-go, and events per 100 km for each limit.
+   ===================================================================== */
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const CELL_M = 7.5, KMH = CELL_M * 3.6;
+  const L = 400;                    // 3 km ring
+  const K = 0.05;                   // p(v) = K * v  (v in cells/step)
+  const P_SLOW = 0.4;               // restart probability from standstill
+  const STEPS_PER_S = 10;
+
+  function makeSim(vmax, canvasId) {
+    const cv = $(canvasId), cx = cv.getContext("2d");
+    return { vmax, cv, cx, W: cv.width, H: cv.height, cars: [],
+             sumV: 0, vehSteps: 0, jamSteps: 0, events: 0, vehKm: 0 };
+  }
+  const A = makeSim(4, "road110");  // ~110 km/h
+  const B = makeSim(5, "road130");  // ~130 km/h
+  let dens = 22, acc = 0, last = performance.now(), uiTick = 0;
+
+  const getVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#000";
+  function speedColor(f) {
+    f = Math.max(0, Math.min(1, f));
+    const s = [[255,59,48],[255,180,0],[52,211,153]];
+    const t = f*2, i = Math.min(1, Math.floor(t)), g = t-i, a = s[i], b = s[i+1];
+    return `rgb(${Math.round(a[0]+(b[0]-a[0])*g)},${Math.round(a[1]+(b[1]-a[1])*g)},${Math.round(a[2]+(b[2]-a[2])*g)})`;
+  }
+
+  function resetSim(S) {
+    const n = Math.max(1, Math.min(L-1, Math.round(dens * L * CELL_M / 1000)));
+    S.cars = [];
+    for (let i = 0; i < n; i++) S.cars.push({ pos: Math.floor(i*L/n), v: S.vmax });
+    for (let i = 1; i < S.cars.length; i++) if (S.cars[i].pos <= S.cars[i-1].pos) S.cars[i].pos = S.cars[i-1].pos + 1;
+    S.sumV = S.vehSteps = S.jamSteps = S.events = 0; S.vehKm = 0;
+  }
+  function resetAll() {
+    resetSim(A); resetSim(B); uiTick = 0;
+    $("e3Note").textContent = A.cars.length + " vozil na cesto · 3,0 km";
+    $("e3Verdict").innerHTML = "Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)";
+  }
+
+  function step(S) {
+    const n = S.cars.length; if (!n) return;
+    for (let i = 0; i < n; i++) {
+      const cur = S.cars[i], ah = S.cars[(i+1) % n];
+      let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += L;
+      let v = Math.min(cur.v + 1, S.vmax);
+      if (v > gap) v = gap;
+      const p = cur.v === 0 ? P_SLOW : Math.min(0.9, K * v);   // slow-to-start, else speed-dependent
+      if (v > 0 && Math.random() < p) { v = Math.max(v - Math.max(1, Math.round(v*0.5)), 0); S.events++; }
+      cur.nv = v;
+    }
+    let vstep = 0, jam = 0;
+    for (let i = 0; i < n; i++) {
+      S.cars[i].v = S.cars[i].nv; S.cars[i].pos = (S.cars[i].pos + S.cars[i].v) % L;
+      vstep += S.cars[i].v; if (S.cars[i].v <= 1) jam++;
+    }
+    S.cars.sort((a, b) => a.pos - b.pos);
+    S.sumV += vstep; S.vehSteps += n; S.jamSteps += jam; S.vehKm += vstep * CELL_M / 1000;
+  }
+
+  function stats(S) {
+    const speed = S.vehSteps ? (S.sumV / S.vehSteps) * KMH : 0;
+    const jamPct = S.vehSteps ? (S.jamSteps / S.vehSteps) * 100 : 0;
+    const evPer100 = S.vehKm > 0.5 ? S.events / (S.vehKm / 100) : 0;
+    return { speed, jamPct, evPer100 };
+  }
+
+  function draw(S) {
+    const { cx, W, H } = S, laneY = H/2, laneH = H*0.56;
+    cx.clearRect(0, 0, W, H);
+    cx.fillStyle = getVar("--track"); cx.fillRect(0, laneY - laneH/2, W, laneH);
+    cx.strokeStyle = getVar("--edge"); cx.setLineDash([14, 14]); cx.lineWidth = 2;
+    cx.beginPath(); cx.moveTo(0, laneY); cx.lineTo(W, laneY); cx.stroke(); cx.setLineDash([]);
+    const sx = W / L, cw = Math.max(4, sx*2.2), ch = laneH*0.62;
+    for (const c of S.cars) {
+      const x = c.pos * sx, f = c.v / S.vmax;
+      cx.fillStyle = speedColor(f);
+      cx.beginPath();
+      if (cx.roundRect) cx.roundRect(x, laneY - ch/2, cw, ch, 2); else cx.rect(x, laneY - ch/2, cw, ch);
+      cx.fill();
+    }
+  }
+
+  function updateUI() {
+    const a = stats(A), b = stats(B);
+    $("s110speed").innerHTML = Math.round(a.speed) + '<small> km/h</small>';
+    $("s130speed").innerHTML = Math.round(b.speed) + '<small> km/h</small>';
+    $("s110jam").textContent = a.jamPct.toFixed(0) + " %";
+    $("s130jam").textContent = b.jamPct.toFixed(0) + " %";
+    $("s110ev").textContent = Math.round(a.evPer100);
+    $("s130ev").textContent = Math.round(b.evPer100);
+    // flag the worse (130) figures
+    $("s130jam").className = "ls-v" + (b.jamPct > a.jamPct + 0.5 ? " ls-bad" : "");
+    $("s130ev").className = "ls-v" + (b.evPer100 > a.evPer100 + 0.5 ? " ls-bad" : "");
+    // verdict once enough data has accumulated
+    if (A.vehKm > 40) {
+      const dJam = a.jamPct > 0.5 ? Math.round((b.jamPct / a.jamPct - 1) * 100) : 0;
+      const dEv  = a.evPer100 > 0.5 ? Math.round((b.evPer100 / a.evPer100 - 1) * 100) : 0;
+      const dSpeed = Math.round(b.speed - a.speed);
+      const same = Math.abs(dSpeed) <= 2;
+      $("e3Verdict").innerHTML =
+        (same ? "<b>Potovalna hitrost je praktično enaka</b> (razlika " + (dSpeed>=0?"+":"") + dSpeed + " km/h). "
+              : "Potovalna hitrost 130: " + (dSpeed>=0?"+":"") + dSpeed + " km/h. ") +
+        "Toda pri <b>130</b> " +
+        (dJam > 0 ? "preživite <b>+" + dJam + " % več časa v koloni</b>" : "je čas v koloni podoben") +
+        (dEv > 0 ? " in doživite <b>+" + dEv + " % več dogodkov</b> na 100 km" : "") +
+        ". Enak čas prihoda, večje tveganje &rarr; nižja omejitev je smiselna.";
+    }
+  }
+
+  $("e3Dens").addEventListener("input", e => { dens = +e.target.value; $("e3vDens").innerHTML = dens + '<span>voz/km</span>'; resetAll(); });
+  $("e3Reset").addEventListener("click", resetAll);
+
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    acc += dt * STEPS_PER_S;
+    let s = 0; while (acc >= 1 && s < 25) { step(A); step(B); acc -= 1; s++; }
+    draw(A); draw(B);
+    if (++uiTick % 6 === 0) updateUI();
+    requestAnimationFrame(frame);
+  }
+
+  resetAll();
   requestAnimationFrame(frame);
 })();
 </script>
