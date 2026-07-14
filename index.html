@@ -236,6 +236,16 @@
   }
   .sbtn:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
   .sbtn svg { width: 16px; height: 16px; fill: currentColor; }
+  .share-link { display: flex; align-items: center; gap: 12px; padding: 0 18px 14px; flex-wrap: wrap; }
+  .share-link .share-lab { margin-right: 0; }
+  .project-url {
+    display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600;
+    color: var(--accent); text-decoration: none; border: 1px solid var(--edge); background: var(--panel-2);
+    border-radius: 10px; padding: 9px 14px; transition: border-color .16s, transform .12s;
+    word-break: break-all;
+  }
+  .project-url:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .project-url svg { width: 15px; height: 15px; fill: currentColor; flex: none; }
   .share-note { font-size: 11.5px; color: var(--ink-3); padding: 0 18px 16px; max-width: 70ch; }
   .toast {
     position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
@@ -414,6 +424,10 @@
         <button class="sbtn" id="shWa" aria-label="Deli na WhatsAppu"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm5.8 14.1c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5-4.5-.2-.2-1.3-1.7-1.3-3.3s.8-2.3 1.1-2.6c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .7.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.4.1.1.1.7-.1 1.4Z"/></svg>WhatsApp</button>
         <button class="sbtn" id="shCopy" aria-label="Kopiraj povezavo"><svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"/></svg>Kopiraj povezavo</button>
       </div>
+    </div>
+    <div class="share-link">
+      <span class="share-lab">Povezava</span>
+      <a class="project-url" id="projectUrl" href="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M10.6 13.4a1 1 0 0 0 1.4 0l5-5a3.5 3.5 0 0 0-5-5l-2 2a1 1 0 1 0 1.4 1.5l2-2a1.5 1.5 0 0 1 2.1 2.1l-5 5a1 1 0 0 0 0 1.4Zm2.8-2.8a1 1 0 0 0-1.4 0l-5 5a3.5 3.5 0 0 0 5 5l2-2a1 1 0 1 0-1.4-1.5l-2 2a1.5 1.5 0 0 1-2.1-2.1l5-5a1 1 0 0 0 0-1.4Z"/></svg><span id="projectUrlTxt">janmacarolvrabec.github.io/Traffic-Jam-Simulator</span></a>
     </div>
     <p class="share-note" id="shareNote">Povezava za deljenje se pripravi samodejno. Za lepo predogledno sličico (naslov + slika) na Facebooku in X objavite datoteko na spletu (npr. GitHub Pages) &mdash; oznake Open Graph in slika <code>og-image.png</code> so že vključene.</p>
   </div>
@@ -793,6 +807,9 @@
   const SHARE_URL = /^https?:$/.test(location.protocol) ? location.href.split(/[?#]/)[0] : DEFAULT_URL;
   const SHARE_TEXT = "Zakaj nastane prometni zastoj iz nič? 🚗 En avto na hip zavre — in kilometre stran nastane kolona. Interaktivni simulator fantomskih zastojev (pripravil Jan Macarol):";
   const enc = encodeURIComponent;
+  // show the actual project link (live URL when hosted, else the published one)
+  $("projectUrl").href = SHARE_URL;
+  $("projectUrlTxt").textContent = SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
   function pop(url) { window.open(url, "_blank", "noopener,noreferrer,width=620,height=560"); }
   $("shFb").addEventListener("click", () => pop("https://www.facebook.com/sharer/sharer.php?u=" + enc(SHARE_URL)));
   $("shX").addEventListener("click", () => pop("https://twitter.com/intent/tweet?text=" + enc(SHARE_TEXT) + "&url=" + enc(SHARE_URL)));
