@@ -14,7 +14,18 @@ Privzete vrednosti so umerjene na **realni slovenski avtocestni promet** (omejit
 
 ### Ugotovitev Poskusa 3 (110 vs 130)
 
-Iz izmerjenih podatkov modela (z verjetnostjo dogodka, odvisno od hitrosti, in počasnim speljevanjem, ki ustreza zlomu pretoka na avtocestah): pri gostem prometu je **potovalna hitrost pri 110 in 130 praktično enaka**, a pri 130 km/h voznik preživi **več časa v koloni (stop-and-go)**, doživi **več dogodkov na 100 km** in — kar je najpomembneje — bistveno **več popolnih zaustavitev** (dogodkov, ki vozilo povsem ustavijo; tipično +15–100 % več, odvisno od gostote). Ker višja omejitev v gneči ne prihrani časa, a poveča tveganje in nemirnost prometa, je **nižja omejitev smiselna**. To je ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah.
+Pošten sklep iz podatkov: **na enem pasu 110 in 130 v pretoku skoraj ne razlikujeta.** V prostem prometu obe omejitvi tečeta gladko (130 le hitreje), v gostem prometu pa sta obe omejeni z razmikom med vozili in se izenačita — zato v koloni z višjo hitrostjo ne prihranite časa.
+
+**Prava razlika je v varnosti**, ne v pretoku, in je velika ter študijsko podprta (Nilssonov potenčni model): pogostost nesreč raste s kvadratom hitrosti, smrtnih pa s četrto potenco. Pri 130 namesto 110 to pomeni:
+
+| | 110 | 130 | Razlika |
+|---|---|---|---|
+| Nesreče s poškodbami (∝ v²) | 100 | 140 | **+40 %** |
+| Smrtne nesreče (∝ v⁴) | 100 | 195 | **+95 %** |
+| Zavorna pot | 97 m | 129 m | **+32 m** |
+| Energija ob trku (∝ v²) | 100 | 140 | **+40 %** |
+
+Za enak čas prihoda torej pri 130 tvegate bistveno več. To je pravi, znanstveni razlog za nižjo omejitev — ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah. Poskus 3 pošteno pokaže oboje: pasova (pretok ≈ enak) in varnostno tablo (tveganje močno različno).
 
 Odprite [`index.html`](index.html) v brskalniku. Datoteka je samostojna (brez zunanjih odvisnosti).
 

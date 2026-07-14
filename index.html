@@ -266,6 +266,18 @@
   .verdict { margin: 12px 18px; padding: 15px 17px; border-radius: 12px; border: 1px solid var(--accent);
     background: color-mix(in srgb, var(--accent) 9%, transparent); font-size: 14px; line-height: 1.5; color: var(--ink); }
   .verdict b { color: var(--accent); font-weight: 700; }
+  .safety { margin: 6px 18px 14px; }
+  .safety-head { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-bottom: 10px; }
+  .safety-head b { color: var(--ink-2); }
+  .safety-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 620px) { .safety-grid { grid-template-columns: repeat(2, 1fr); } }
+  .sf { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 11px; padding: 12px 13px; }
+  .sf-l { font-size: 11.5px; color: var(--ink-3); line-height: 1.3; min-height: 30px; }
+  .sf-nums { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+  .sf-a { font-size: 14px; color: var(--flow); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sf-arrow { color: var(--ink-3); font-size: 12px; }
+  .sf-b { font-size: 22px; color: var(--jam); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .sf-d { font-size: 12px; color: var(--jam); font-weight: 700; margin-top: 5px; }
 
   /* ---- Share ---- */
   .share { display: flex; align-items: center; gap: 12px; padding: 16px 18px; flex-wrap: wrap; }
@@ -352,8 +364,8 @@
     <div class="card">
       <span class="g-tag">Poskus 3</span>
       <span class="g-title">110 proti 130</span>
-      <p class="g-desc">Dve enaki cesti, ista gostota &mdash; le omejitev je drugačna. Verjetnost dogodka raste s hitrostjo, kot v resnici: pri 130 v enakem reakcijskem času prevozite več metrov.</p>
-      <span class="g-how"><span><b>Kaj opazovati:</b> potovalna hitrost je skoraj enaka, a pri 130 je <b>več dogodkov in več stop-and-go</b>. Dokaz, zakaj je nižja omejitev smiselna.</span></span>
+      <p class="g-desc">Dve enaki cesti, ista gostota &mdash; le omejitev je drugačna. Pošteno: v gostem prometu je potovalni čas skoraj enak.</p>
+      <span class="g-how"><span><b>Kaj opazovati:</b> pretok se skoraj ne razlikuje, a <b>varnost dramatično</b> &mdash; po Nilssonu ima 130 <b>+40 % nesreč in +95 % smrtnih</b>. To je pravi razlog za nižjo omejitev.</span></span>
     </div>
   </div>
 
@@ -519,7 +531,7 @@
   <div class="section-label">
     <span class="sl-num">Poskus 3</span>
     <h2>Zakaj 110 namesto 130</h2>
-    <span class="sl-sub">enaka cesta, enaka gostota &middot; spremeni se le omejitev &middot; verjetnost dogodka raste s hitrostjo</span>
+    <span class="sl-sub">v gostem prometu enak potovalni čas &middot; a zelo različno tveganje</span>
   </div>
 
   <div class="card">
@@ -550,17 +562,44 @@
       </div>
     </div>
     <div class="verdict" id="e3Verdict">Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)</div>
+
+    <div class="safety">
+      <div class="safety-head">Prava razlika je v varnosti &mdash; potenčni model <b>(Nilsson)</b> pri isti vožnji</div>
+      <div class="safety-grid">
+        <div class="sf">
+          <div class="sf-l">Nesreče s poškodbami <span style="opacity:.7">(&prop; hitrost²)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;100</span><span class="sf-arrow">&rarr;</span><span class="sf-b">140</span></div>
+          <div class="sf-d">+40 % pri 130</div>
+        </div>
+        <div class="sf">
+          <div class="sf-l">Smrtne nesreče <span style="opacity:.7">(&prop; hitrost⁴)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;100</span><span class="sf-arrow">&rarr;</span><span class="sf-b">195</span></div>
+          <div class="sf-d">+95 % pri 130</div>
+        </div>
+        <div class="sf">
+          <div class="sf-l">Zavorna pot <span style="opacity:.7">(reakcija + zaviranje)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;97&nbsp;m</span><span class="sf-arrow">&rarr;</span><span class="sf-b">129&nbsp;m</span></div>
+          <div class="sf-d">+32 m daljša pri 130</div>
+        </div>
+        <div class="sf">
+          <div class="sf-l">Energija ob trku <span style="opacity:.7">(&prop; hitrost²)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;100</span><span class="sf-arrow">&rarr;</span><span class="sf-b">140</span></div>
+          <div class="sf-d">+40 % pri 130</div>
+        </div>
+      </div>
+    </div>
+
     <div class="e2-controls">
       <div class="ctrl" style="flex:1; min-width:220px">
         <div class="ctrl-top">
           <div class="ctrl-name">Gostota prometa (obe cesti)</div>
-          <div class="ctrl-val" id="e3vDens">22<span>voz/km</span></div>
+          <div class="ctrl-val" id="e3vDens">20<span>voz/km</span></div>
         </div>
-        <input type="range" id="e3Dens" min="12" max="45" step="1" value="22">
+        <input type="range" id="e3Dens" min="12" max="45" step="1" value="20">
       </div>
       <button class="btn" id="e3Reset">&#8635; Ponastavi meritve</button>
     </div>
-    <p class="share-note">Verjetnost dogodka tu <b>raste s hitrostjo</b> (p &prop; v): v enakem reakcijskem času (~1 s) pri 130 prevozite več metrov &mdash; manj rezerve, več dogodkov. Po nekaj sekundah merjenja se pokaže: <b>potovalna hitrost je skoraj enaka</b>, a pri 130 preživite <b>več časa v koloni</b> in &mdash; kar je najpomembneje &mdash; doživite bistveno <b>več popolnih zaustavitev</b> (dogodkov, ki vozilo povsem ustavijo). Enak čas prihoda, večje tveganje in bolj sunkovit promet &mdash; zato je nižja omejitev smiselna. (Model dodatno vključuje počasno speljevanje iz zastoja, kar ustreza zlomu pretoka na realnih avtocestah.)</p>
+    <p class="share-note"><b>Pošten sklep.</b> Na enem pasu 110 in 130 v <b>pretoku skoraj ne razlikujeta</b>: v prostem prometu obe tečeta gladko (130 le hitreje), v gostem prometu pa sta obe omejeni z razmikom in se izenačita &mdash; zato v koloni z višjo hitrostjo ne prihranite časa. Prava razlika je v <b>varnosti</b>: pogostost nesreč raste s kvadratom hitrosti, smrtnih pa s četrto potenco (Nilssonov potenčni model). Pri 130 namesto 110 to pomeni <b>+40 % nesreč s poškodbami in +95 % smrtnih nesreč</b> &mdash; za enak čas prihoda. To je pravi, znanstveni razlog za nižjo omejitev. (Verjetnost dogodka v simulaciji raste kvadratno s hitrostjo, skladno z istim modelom.)</p>
   </div>
 
   <!-- EXPLAIN -->
@@ -1157,7 +1196,7 @@
   const $ = id => document.getElementById(id);
   const CELL_M = 7.5, KMH = CELL_M * 3.6;
   const L = 400;                    // 3 km ring
-  const K = 0.05;                   // p(v) = K * v  (v in cells/step)
+  const K = 0.01;                   // p(v) = K * v^2  (Nilsson-like, quadratic in speed)
   const P_SLOW = 0.4;               // restart probability from standstill
   const STEPS_PER_S = 10;
 
@@ -1168,7 +1207,7 @@
   }
   const A = makeSim(4, "road110");  // ~110 km/h
   const B = makeSim(5, "road130");  // ~130 km/h
-  let dens = 22, acc = 0, last = performance.now(), uiTick = 0;
+  let dens = 20, acc = 0, last = performance.now(), uiTick = 0;
 
   const getVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#000";
   function speedColor(f) {
@@ -1198,7 +1237,7 @@
       let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += L;
       let v = Math.min(cur.v + 1, S.vmax);
       if (v > gap) v = gap;
-      const p = cur.v === 0 ? P_SLOW : Math.min(0.9, K * v);   // slow-to-start, else speed-dependent
+      const p = cur.v === 0 ? P_SLOW : Math.min(0.9, K * v * v);   // slow-to-start, else p grows with speed^2
       if (v > 0 && Math.random() < p) { v = Math.max(v - Math.max(1, Math.round(v*0.5)), 0); S.events++; }
       if (v === 0 && cur.v > 0) S.fullStops++;                 // a fresh complete stop
       cur.nv = v;
@@ -1255,15 +1294,14 @@
       const dJam  = a.jamPct    > 0.5 ? Math.round((b.jamPct    / a.jamPct    - 1) * 100) : 0;
       const dStop = a.stopPer100 > 0.5 ? Math.round((b.stopPer100 / a.stopPer100 - 1) * 100) : 0;
       const dSpeed = Math.round(b.speed - a.speed);
-      let head, tail;
-      if (dSpeed <= -3)      { head = "Pri <b>130</b> je potovalna hitrost celo <b>nižja</b> (" + dSpeed + " km/h). "; tail = "Promet je počasnejši <em>in</em> bolj tvegan"; }
-      else if (dSpeed >= 3)  { head = "Pri <b>130</b> je potovalna hitrost +" + dSpeed + " km/h. "; tail = "Za droben prihranek časa precej večje tveganje"; }
-      else                   { head = "<b>Potovalna hitrost je praktično enaka</b> (razlika " + (dSpeed>=0?"+":"") + dSpeed + " km/h). "; tail = "Enak čas prihoda, a bolj sunkovit in tvegan promet"; }
+      let head;
+      if (dSpeed <= -3)     head = "V gostem prometu je pri <b>130</b> potovalna hitrost celo <b>nižja</b> (" + dSpeed + " km/h). ";
+      else if (dSpeed >= 3) head = "V gostem prometu je pri <b>130</b> potovalna hitrost le +" + dSpeed + " km/h. ";
+      else                  head = "<b>V gostem prometu je potovalna hitrost skoraj enaka</b> (razlika " + (dSpeed>=0?"+":"") + dSpeed + " km/h). ";
       $("e3Verdict").innerHTML = head +
-        "Toda pri <b>130 km/h</b> je <b>+" + Math.max(dStop, 0) + " % več popolnih zaustavitev</b> " +
-        "(dogodkov, ki vozilo povsem ustavijo)" +
-        (dJam > 0 ? " in <b>+" + dJam + " % več časa v koloni</b>" : "") +
-        ". " + tail + " &rarr; nižja omejitev je smiselna.";
+        "Na pretok torej 110 in 130 skoraj ne vplivata" +
+        (dStop > 3 ? " (pri 130 le nekaj več popolnih zaustavitev, +" + dStop + " %)" : "") +
+        ". <b>Prava razlika je v varnosti:</b> po potenčnem modelu ima 130&nbsp;km/h <b>+40 % nesreč s poškodbami</b> in <b>+95 % smrtnih nesreč</b> &mdash; za enak čas prihoda. Zato je nižja omejitev smiselna.";
     }
   }
 
