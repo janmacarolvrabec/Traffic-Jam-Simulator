@@ -25,7 +25,9 @@ Pošten sklep iz podatkov: **na enem pasu 110 in 130 v pretoku skoraj ne razliku
 | Zavorna pot | 97 m | 129 m | **+32 m** |
 | Energija ob trku (∝ v²) | 100 | 140 | **+40 %** |
 
-Za enak čas prihoda torej pri 130 tvegate bistveno več. To je pravi, znanstveni razlog za nižjo omejitev — ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah. Poskus 3 pošteno pokaže oboje: pasova (pretok ≈ enak) in varnostno tablo (tveganje močno različno).
+Za enak čas prihoda torej pri 130 tvegate bistveno več. To je pravi, znanstveni razlog za nižjo omejitev — ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah.
+
+Poskus 3 to pokaže na treh ravneh: **pasova** (pretok ≈ enak), **varnostna tabla** (stopnje pri isti vožnji) in **panel »Skozi čas«** — pospešeni odometer prevoženih kilometrov, ob katerem se ločeno nabirata skupka nesreč za 110 in 130. Ker per-sekundna razlika ni očitna, se šele skozi prevožene kilometre pokaže, kako se razmerje (×1,40 nesreč, ×1,95 smrtnih) sešteje v vse večjo absolutno razliko.
 
 Odprite [`index.html`](index.html) v brskalniku. Datoteka je samostojna (brez zunanjih odvisnosti).
 

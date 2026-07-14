@@ -278,6 +278,24 @@
   .sf-arrow { color: var(--ink-3); font-size: 12px; }
   .sf-b { font-size: 22px; color: var(--jam); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
   .sf-d { font-size: 12px; color: var(--jam); font-weight: 700; margin-top: 5px; }
+  /* accelerated-time accumulator */
+  .accum { margin: 8px 18px 14px; }
+  .odo { display: flex; align-items: baseline; gap: 14px; background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 11px; padding: 13px 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .odo-l { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+  .odo-v { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: -.01em; }
+  .odo-v small { font-size: 13px; color: var(--ink-3); font-weight: 600; }
+  .accum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px) { .accum-grid { grid-template-columns: 1fr; } }
+  .acc-card { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 11px; padding: 13px 16px; }
+  .acc-t { font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 9px; }
+  .acc-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 3px 0; }
+  .acc-110 { font-size: 13px; font-weight: 700; color: var(--flow); }
+  .acc-130 { font-size: 13px; font-weight: 700; color: var(--jam); }
+  .acc-n { font-size: 23px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .acc-n.bad { color: var(--jam); }
+  .acc-d { font-size: 12.5px; font-weight: 700; color: var(--jam); margin-top: 7px; min-height: 16px; }
+  .accum-note { font-size: 11.5px; color: var(--ink-3); margin-top: 11px; line-height: 1.45; }
+  .accum-note b { color: var(--ink-2); }
 
   /* ---- Share ---- */
   .share { display: flex; align-items: center; gap: 12px; padding: 16px 18px; flex-wrap: wrap; }
@@ -563,8 +581,31 @@
     </div>
     <div class="verdict" id="e3Verdict">Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)</div>
 
+    <div class="accum">
+      <div class="safety-head">Skozi čas se razlika nabere &mdash; nesreče na prevožene kilometre <b>(pospešeni čas)</b></div>
+      <div class="odo">
+        <span class="odo-l">simulirani promet</span>
+        <span class="odo-v"><span id="odoKm">0</span> <small>vozil-km</small></span>
+      </div>
+      <div class="accum-grid">
+        <div class="acc-card">
+          <div class="acc-t">Nesreče s poškodbami</div>
+          <div class="acc-row"><span class="acc-110">omejitev 110</span><span class="acc-n" id="acc110">0</span></div>
+          <div class="acc-row"><span class="acc-130">omejitev 130</span><span class="acc-n bad" id="acc130">0</span></div>
+          <div class="acc-d" id="accDelta">&nbsp;</div>
+        </div>
+        <div class="acc-card">
+          <div class="acc-t">Smrtne nesreče</div>
+          <div class="acc-row"><span class="acc-110">omejitev 110</span><span class="acc-n" id="fat110">0</span></div>
+          <div class="acc-row"><span class="acc-130">omejitev 130</span><span class="acc-n bad" id="fat130">0</span></div>
+          <div class="acc-d" id="fatDelta">&nbsp;</div>
+        </div>
+      </div>
+      <div class="accum-note">Osnovna stopnja nesreč je ilustrativna (reda velikosti za avtoceste); znanstveni del je <b>razmerje</b> iz Nilssonovega modela: pri 130 proti 110 je nesreč s poškodbami <b>&times;1,40</b>, smrtnih pa <b>&times;1,95</b>. Čim več kilometrov se prevozi, tem bolj očitna postane razlika &mdash; enak čas prihoda, a vse več ponesrečenih.</div>
+    </div>
+
     <div class="safety">
-      <div class="safety-head">Prava razlika je v varnosti &mdash; potenčni model <b>(Nilsson)</b> pri isti vožnji</div>
+      <div class="safety-head">Stopnje pri isti vožnji &mdash; potenčni model <b>(Nilsson)</b></div>
       <div class="safety-grid">
         <div class="sf">
           <div class="sf-l">Nesreče s poškodbami <span style="opacity:.7">(&prop; hitrost²)</span></div>
@@ -1209,6 +1250,33 @@
   const B = makeSim(5, "road130");  // ~130 km/h
   let dens = 20, acc = 0, last = performance.now(), uiTick = 0;
 
+  // --- Accelerated-time accumulator: crashes pile up per vehicle-km ---
+  // Base rate is illustrative (motorway order of magnitude); the science is the
+  // Nilsson ratio: casualty crashes x1.40, fatal x1.95 at 130 vs 110.
+  const KM_PER_SEC = 50e6, BASE_CAS = 1e-7, BASE_FAT = 3.5e-9, R_CAS = 1.40, R_FAT = 1.95;
+  let odoKm = 0, cas110 = 0, cas130 = 0, fat110 = 0, fat130 = 0;
+  const nf = n => Math.round(n).toLocaleString("sl");
+  function fmtKm(k) {
+    if (k >= 1e9) return (k / 1e9).toFixed(2).replace(".", ",") + " mrd";
+    if (k >= 1e6) return (k / 1e6).toFixed(1).replace(".", ",") + " mio";
+    return nf(k);
+  }
+  function accumulate(dt) {
+    const dkm = KM_PER_SEC * dt;
+    odoKm += dkm;
+    cas110 += BASE_CAS * dkm;         cas130 += BASE_CAS * R_CAS * dkm;
+    fat110 += BASE_FAT * dkm;         fat130 += BASE_FAT * R_FAT * dkm;
+  }
+  function updateAccum() {
+    $("odoKm").textContent = fmtKm(odoKm);
+    $("acc110").textContent = nf(cas110); $("acc130").textContent = nf(cas130);
+    $("fat110").textContent = nf(fat110); $("fat130").textContent = nf(fat130);
+    const dCas = Math.round(cas130 - cas110), dFat = Math.round(fat130 - fat110);
+    $("accDelta").textContent = dCas > 0 ? "+" + nf(dCas) + " več pri 130  (+40 %)" : "";
+    $("fatDelta").textContent = dFat > 0 ? "+" + nf(dFat) + " več pri 130  (+95 %)" : "";
+  }
+  function resetAccum() { odoKm = cas110 = cas130 = fat110 = fat130 = 0; }
+
   const getVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#000";
   function speedColor(f) {
     f = Math.max(0, Math.min(1, f));
@@ -1225,7 +1293,7 @@
     S.sumV = S.vehSteps = S.jamSteps = S.events = S.fullStops = 0; S.vehKm = 0;
   }
   function resetAll() {
-    resetSim(A); resetSim(B); uiTick = 0;
+    resetSim(A); resetSim(B); resetAccum(); uiTick = 0;
     $("e3Note").textContent = A.cars.length + " vozil na cesto · 3,0 km";
     $("e3Verdict").innerHTML = "Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)";
   }
@@ -1312,8 +1380,9 @@
     const dt = Math.min(0.1, (now - last) / 1000); last = now;
     acc += dt * STEPS_PER_S;
     let s = 0; while (acc >= 1 && s < 25) { step(A); step(B); acc -= 1; s++; }
+    accumulate(dt);
     draw(A); draw(B);
-    if (++uiTick % 6 === 0) updateUI();
+    if (++uiTick % 6 === 0) { updateUI(); updateAccum(); }
     requestAnimationFrame(frame);
   }
 
