@@ -256,7 +256,8 @@
   .b130 { background: color-mix(in srgb, var(--jam) 18%, transparent); color: var(--jam); border: 1px solid var(--jam); }
   .lane-sub { font-size: 11.5px; color: var(--ink-3); }
   #road110, #road130 { width: 100%; height: auto; display: block; border-radius: 8px; }
-  .lane-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 11px; }
+  .lane-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 11px; }
+  @media (max-width: 620px) { .lane-stats { grid-template-columns: repeat(2, 1fr); } }
   .ls { text-align: center; }
   .ls-v { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
   .ls-v small { font-size: 12px; font-weight: 600; color: var(--ink-3); }
@@ -327,7 +328,8 @@
     <div class="brand">
       <div class="eyebrow">Prometna dinamika &middot; Model Nagel–Schreckenberg</div>
       <h1>Simulator <em>fantomskih</em> zastojev</h1>
-      <p class="lede">Ste že obstali v koloni, ki se je nenadoma razpustila &mdash; brez nesreče, brez gradbišča, brez razloga? To je <em>fantomski zastoj</em>. Nastane sam od sebe: ena previdna zavora se ojača v val, ki potuje <em>nazaj</em> po cesti hitreje, kot vozniki mislijo. Ta simulator to pokaže na dva načina, s parametri, umerjenimi na <b>realni slovenski avtocestni promet</b>.</p>
+      <p class="lede">Ste že obtičali v koloni, ki se je čez nekaj minut sama razpustila &mdash; nikjer nesreče, gradbišča ali kakršne koli ovire? Doživeli ste <em>fantomski zastoj</em>. Nastane povsem sam od sebe: dovolj je, da en sam voznik za hip premočno zavre. Njegova motnja se prenese na vozilo zadaj, se pri vsakem naslednjem še okrepi in se sprevrže v gost sklop, ki počasi drsi <em>nazaj</em> po avtocesti &mdash; naravnost proti vam. Ko končno pripeljete do njega, vzroka ni več. Ostal je le duh davne zavore.</p>
+      <p class="lede">Spodnji trije poskusi pokažejo, <b>kako</b> tak zastoj vznikne, <b>kaj</b> ga sproži in <b>zakaj</b> nižja omejitev pomeni bolj tekoč in varnejši promet. Vse vrednosti so umerjene na realni slovenski avtocestni promet.</p>
       <p class="byline">Poskus pripravil <b>Jan Macarol</b></p>
     </div>
     <button class="theme-btn" id="themeBtn" aria-label="Preklopi temo"><span id="themeIcon">&#9788;</span> <span id="themeTxt">Svetla tema</span></button>
@@ -533,6 +535,7 @@
           <div class="ls"><div class="ls-v" id="s110speed">&ndash;</div><div class="ls-l">potovalna hitrost</div></div>
           <div class="ls"><div class="ls-v" id="s110jam">&ndash;</div><div class="ls-l">% časa v koloni</div></div>
           <div class="ls"><div class="ls-v" id="s110ev">&ndash;</div><div class="ls-l">dogodki / 100 km</div></div>
+          <div class="ls"><div class="ls-v" id="s110stop">&ndash;</div><div class="ls-l">popolne zaustavitve / 100 km</div></div>
         </div>
       </div>
       <div class="lane-block">
@@ -542,6 +545,7 @@
           <div class="ls"><div class="ls-v" id="s130speed">&ndash;</div><div class="ls-l">potovalna hitrost</div></div>
           <div class="ls"><div class="ls-v" id="s130jam">&ndash;</div><div class="ls-l">% časa v koloni</div></div>
           <div class="ls"><div class="ls-v" id="s130ev">&ndash;</div><div class="ls-l">dogodki / 100 km</div></div>
+          <div class="ls"><div class="ls-v" id="s130stop">&ndash;</div><div class="ls-l">popolne zaustavitve / 100 km</div></div>
         </div>
       </div>
     </div>
@@ -556,7 +560,7 @@
       </div>
       <button class="btn" id="e3Reset">&#8635; Ponastavi meritve</button>
     </div>
-    <p class="share-note">Verjetnost dogodka tu <b>raste s hitrostjo</b> (p &prop; v): v enakem reakcijskem času (~1 s) pri 130 prevozite več metrov &mdash; manj rezerve, več dogodkov. Po nekaj sekundah merjenja se pokaže: <b>potovalna hitrost je skoraj enaka</b>, a pri 130 preživite <b>več časa v koloni</b> in doživite <b>več dogodkov</b>. Enak čas prihoda, večje tveganje &mdash; zato je nižja omejitev smiselna. (Model dodatno vključuje počasno speljevanje iz zastoja, kar ustreza zlomu pretoka na realnih avtocestah.)</p>
+    <p class="share-note">Verjetnost dogodka tu <b>raste s hitrostjo</b> (p &prop; v): v enakem reakcijskem času (~1 s) pri 130 prevozite več metrov &mdash; manj rezerve, več dogodkov. Po nekaj sekundah merjenja se pokaže: <b>potovalna hitrost je skoraj enaka</b>, a pri 130 preživite <b>več časa v koloni</b> in &mdash; kar je najpomembneje &mdash; doživite bistveno <b>več popolnih zaustavitev</b> (dogodkov, ki vozilo povsem ustavijo). Enak čas prihoda, večje tveganje in bolj sunkovit promet &mdash; zato je nižja omejitev smiselna. (Model dodatno vključuje počasno speljevanje iz zastoja, kar ustreza zlomu pretoka na realnih avtocestah.)</p>
   </div>
 
   <!-- EXPLAIN -->
@@ -564,16 +568,16 @@
     <div class="card-head"><span class="card-title">Kako nastane fantomski zastoj</span></div>
     <div class="explain-grid">
       <div class="ex-item">
-        <h3><span class="ex-num">01</span> Motnja</h3>
-        <p>En voznik za hip popusti plin ali rahlo zavre &mdash; brez razloga. Pri gostem prometu razmik ne dopušča napake.</p>
+        <h3><span class="ex-num">01</span> Drobna motnja</h3>
+        <p>Dovolj je malenkost: voznik za trenutek popusti plin ali rahlo pritisne zavoro &mdash; pogosto brez pravega razloga. Pri gostem prometu je razmik premajhen, da bi to napako požrl.</p>
       </div>
       <div class="ex-item">
         <h3><span class="ex-num">02</span> Ojačanje</h3>
-        <p>Voznik zadaj reagira z zamikom in zavre močneje. Vsak naslednji zavre še malo bolj &mdash; motnja raste.</p>
+        <p>Voznik za njim rdeče luči opazi z zamikom, zato zavre močneje, kot bi bilo treba. Naslednji stori isto, le še malo bolj &mdash; motnja z vsakim vozilom raste namesto da bi pojenjala.</p>
       </div>
       <div class="ex-item">
         <h3><span class="ex-num">03</span> Val nazaj</h3>
-        <p>Nastane gost sklop, ki potuje nazaj skozi kolono pri ~15 km/h. Ko pridete vanj, ovire ni &mdash; le duh prejšnje zavore.</p>
+        <p>Iz drobne zavore nastane gost sklop vozil, ki drsi <b>nazaj</b> po koloni s približno 15 km/h. Ko pridete vanj, ni ne ovire ne krivca &mdash; le sled zavore izpred nekaj minut.</p>
       </div>
     </div>
     <div class="studies">
@@ -1160,7 +1164,7 @@
   function makeSim(vmax, canvasId) {
     const cv = $(canvasId), cx = cv.getContext("2d");
     return { vmax, cv, cx, W: cv.width, H: cv.height, cars: [],
-             sumV: 0, vehSteps: 0, jamSteps: 0, events: 0, vehKm: 0 };
+             sumV: 0, vehSteps: 0, jamSteps: 0, events: 0, fullStops: 0, vehKm: 0 };
   }
   const A = makeSim(4, "road110");  // ~110 km/h
   const B = makeSim(5, "road130");  // ~130 km/h
@@ -1179,7 +1183,7 @@
     S.cars = [];
     for (let i = 0; i < n; i++) S.cars.push({ pos: Math.floor(i*L/n), v: S.vmax });
     for (let i = 1; i < S.cars.length; i++) if (S.cars[i].pos <= S.cars[i-1].pos) S.cars[i].pos = S.cars[i-1].pos + 1;
-    S.sumV = S.vehSteps = S.jamSteps = S.events = 0; S.vehKm = 0;
+    S.sumV = S.vehSteps = S.jamSteps = S.events = S.fullStops = 0; S.vehKm = 0;
   }
   function resetAll() {
     resetSim(A); resetSim(B); uiTick = 0;
@@ -1196,6 +1200,7 @@
       if (v > gap) v = gap;
       const p = cur.v === 0 ? P_SLOW : Math.min(0.9, K * v);   // slow-to-start, else speed-dependent
       if (v > 0 && Math.random() < p) { v = Math.max(v - Math.max(1, Math.round(v*0.5)), 0); S.events++; }
+      if (v === 0 && cur.v > 0) S.fullStops++;                 // a fresh complete stop
       cur.nv = v;
     }
     let vstep = 0, jam = 0;
@@ -1211,7 +1216,8 @@
     const speed = S.vehSteps ? (S.sumV / S.vehSteps) * KMH : 0;
     const jamPct = S.vehSteps ? (S.jamSteps / S.vehSteps) * 100 : 0;
     const evPer100 = S.vehKm > 0.5 ? S.events / (S.vehKm / 100) : 0;
-    return { speed, jamPct, evPer100 };
+    const stopPer100 = S.vehKm > 0.5 ? S.fullStops / (S.vehKm / 100) : 0;
+    return { speed, jamPct, evPer100, stopPer100 };
   }
 
   function draw(S) {
@@ -1238,22 +1244,26 @@
     $("s130jam").textContent = b.jamPct.toFixed(0) + " %";
     $("s110ev").textContent = Math.round(a.evPer100);
     $("s130ev").textContent = Math.round(b.evPer100);
+    $("s110stop").textContent = Math.round(a.stopPer100);
+    $("s130stop").textContent = Math.round(b.stopPer100);
     // flag the worse (130) figures
     $("s130jam").className = "ls-v" + (b.jamPct > a.jamPct + 0.5 ? " ls-bad" : "");
     $("s130ev").className = "ls-v" + (b.evPer100 > a.evPer100 + 0.5 ? " ls-bad" : "");
-    // verdict once enough data has accumulated
-    if (A.vehKm > 40) {
-      const dJam = a.jamPct > 0.5 ? Math.round((b.jamPct / a.jamPct - 1) * 100) : 0;
-      const dEv  = a.evPer100 > 0.5 ? Math.round((b.evPer100 / a.evPer100 - 1) * 100) : 0;
+    $("s130stop").className = "ls-v" + (b.stopPer100 > a.stopPer100 + 0.5 ? " ls-bad" : "");
+    // verdict once enough data has accumulated for stable figures
+    if (A.vehKm > 140) {
+      const dJam  = a.jamPct    > 0.5 ? Math.round((b.jamPct    / a.jamPct    - 1) * 100) : 0;
+      const dStop = a.stopPer100 > 0.5 ? Math.round((b.stopPer100 / a.stopPer100 - 1) * 100) : 0;
       const dSpeed = Math.round(b.speed - a.speed);
-      const same = Math.abs(dSpeed) <= 2;
-      $("e3Verdict").innerHTML =
-        (same ? "<b>Potovalna hitrost je praktično enaka</b> (razlika " + (dSpeed>=0?"+":"") + dSpeed + " km/h). "
-              : "Potovalna hitrost 130: " + (dSpeed>=0?"+":"") + dSpeed + " km/h. ") +
-        "Toda pri <b>130</b> " +
-        (dJam > 0 ? "preživite <b>+" + dJam + " % več časa v koloni</b>" : "je čas v koloni podoben") +
-        (dEv > 0 ? " in doživite <b>+" + dEv + " % več dogodkov</b> na 100 km" : "") +
-        ". Enak čas prihoda, večje tveganje &rarr; nižja omejitev je smiselna.";
+      let head, tail;
+      if (dSpeed <= -3)      { head = "Pri <b>130</b> je potovalna hitrost celo <b>nižja</b> (" + dSpeed + " km/h). "; tail = "Promet je počasnejši <em>in</em> bolj tvegan"; }
+      else if (dSpeed >= 3)  { head = "Pri <b>130</b> je potovalna hitrost +" + dSpeed + " km/h. "; tail = "Za droben prihranek časa precej večje tveganje"; }
+      else                   { head = "<b>Potovalna hitrost je praktično enaka</b> (razlika " + (dSpeed>=0?"+":"") + dSpeed + " km/h). "; tail = "Enak čas prihoda, a bolj sunkovit in tvegan promet"; }
+      $("e3Verdict").innerHTML = head +
+        "Toda pri <b>130 km/h</b> je <b>+" + Math.max(dStop, 0) + " % več popolnih zaustavitev</b> " +
+        "(dogodkov, ki vozilo povsem ustavijo)" +
+        (dJam > 0 ? " in <b>+" + dJam + " % več časa v koloni</b>" : "") +
+        ". " + tail + " &rarr; nižja omejitev je smiselna.";
     }
   }
 

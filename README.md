@@ -14,7 +14,7 @@ Privzete vrednosti so umerjene na **realni slovenski avtocestni promet** (omejit
 
 ### Ugotovitev Poskusa 3 (110 vs 130)
 
-Iz izmerjenih podatkov modela (z verjetnostjo dogodka, odvisno od hitrosti, in počasnim speljevanjem, ki ustreza zlomu pretoka na avtocestah): pri gostem prometu je **potovalna hitrost pri 110 in 130 praktično enaka**, a pri 130 km/h voznik preživi **več časa v koloni (stop-and-go)** in doživi **več dogodkov na 100 km**. Ker višja omejitev v gneči ne prihrani časa, a poveča tveganje in nemirnost prometa, je **nižja omejitev smiselna**. To je ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah.
+Iz izmerjenih podatkov modela (z verjetnostjo dogodka, odvisno od hitrosti, in počasnim speljevanjem, ki ustreza zlomu pretoka na avtocestah): pri gostem prometu je **potovalna hitrost pri 110 in 130 praktično enaka**, a pri 130 km/h voznik preživi **več časa v koloni (stop-and-go)**, doživi **več dogodkov na 100 km** in — kar je najpomembneje — bistveno **več popolnih zaustavitev** (dogodkov, ki vozilo povsem ustavijo; tipično +15–100 % več, odvisno od gostote). Ker višja omejitev v gneči ne prihrani časa, a poveča tveganje in nemirnost prometa, je **nižja omejitev smiselna**. To je ista logika, na kateri temeljijo **spremenljive omejitve hitrosti** na avtocestah.
 
 Odprite [`index.html`](index.html) v brskalniku. Datoteka je samostojna (brez zunanjih odvisnosti).
 
