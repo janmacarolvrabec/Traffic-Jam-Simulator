@@ -1,5 +1,9 @@
 # Simulator fantomskih zastojev
 
+**Povezavi:**
+- 🌐 Spletna stran (GitHub Pages): <https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/>
+- ✦ Interaktivno v Claude: <https://claude.ai/code/artifact/985c6ce4-d567-4868-974a-2655387acde6>
+
 Interaktivni simulator **fantomskih zastojev** (angl. *phantom traffic jams*) — zastojev, ki nastanejo brez vsakršne ovire, zgolj iz drobnih motenj v vožnji, ki se ojačajo v val, ki potuje nazaj po cesti.
 
 Avtor eksperimentov: **Jan Macarol**. Zasnovano po recenziranih znanstvenih raziskavah (Sugiyama 2008, Nagel–Schreckenberg 1992, Nilsson–Elvik potenčni model).
