@@ -1,0 +1,1502 @@
+<!doctype html>
+<html lang="sl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kdo je kriv za fantomski zastoj? &middot; Simulator (3 poskusi)</title>
+<meta name="author" content="Jan Macarol">
+<meta name="description" content="Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije interaktivni poskusi razkrijejo, kdo je v resnici kriv za fantomski zastoj. Pripravil Jan Macarol.">
+
+<!-- Open Graph (Facebook, LinkedIn, WhatsApp, ...) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Simulator fantomskih zastojev">
+<meta property="og:locale" content="sl_SI">
+<meta property="og:url" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/">
+<meta property="og:title" content="Kdo je kriv za fantomski zastoj? 🕵️">
+<meta property="og:description" content="Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije interaktivni poskusi razkrijejo krivca, in ni tam, kjer bi pričakovali. Preizkusi sam. Pripravil Jan Macarol.">
+<meta property="og:image" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Krožna proga z avtomobili in povečevalno steklo nad enim vozilom — kdo je kriv za zastoj?">
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kdo je kriv za fantomski zastoj? 🕵️">
+<meta name="twitter:description" content="Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije poskusi razkrijejo krivca. Preizkusi sam.">
+<meta name="twitter:image" content="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/og-image.png">
+<meta name="theme-color" content="#ffb400">
+<style>
+  /* ---- Reset ---- */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; }
+  input[type="range"] { -webkit-appearance: none; appearance: none; }
+
+  /* ---- Tokens ---- */
+  :root {
+    --bg:        #10131a;
+    --bg-grad-1: #141821;
+    --bg-grad-2: #0d1016;
+    --panel:     #191d27;
+    --panel-2:   #1f2531;
+    --edge:      #2a3140;
+    --edge-soft: #222836;
+    --ink:       #eef1f6;
+    --ink-2:     #aab4c4;
+    --ink-3:     #6c7789;
+    --accent:    #ffb400;
+    --accent-dim:#c98f10;
+    --jam:       #ff3b30;
+    --mid:       #ffb400;
+    --flow:      #34d399;
+    --track:     #23293480;
+    --shadow:    0 18px 40px -20px rgba(0,0,0,.7);
+    color-scheme: dark;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg:        #eef0f3;
+      --bg-grad-1: #f4f5f8;
+      --bg-grad-2: #e4e7ec;
+      --panel:     #ffffff;
+      --panel-2:   #f3f5f8;
+      --edge:      #d3d8e0;
+      --edge-soft: #e2e6ec;
+      --ink:       #171b22;
+      --ink-2:     #4b5563;
+      --ink-3:     #8a94a3;
+      --accent:    #b57400;
+      --accent-dim:#d69b28;
+      --jam:       #d61f16;
+      --mid:       #cc8b00;
+      --flow:      #0f9d63;
+      --track:     #cdd3dc;
+      --shadow:    0 18px 40px -22px rgba(30,40,60,.35);
+      color-scheme: light;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg:#10131a; --bg-grad-1:#141821; --bg-grad-2:#0d1016; --panel:#191d27; --panel-2:#1f2531;
+    --edge:#2a3140; --edge-soft:#222836; --ink:#eef1f6; --ink-2:#aab4c4; --ink-3:#6c7789;
+    --accent:#ffb400; --accent-dim:#c98f10; --jam:#ff3b30; --mid:#ffb400; --flow:#34d399;
+    --track:#23293480; --shadow:0 18px 40px -20px rgba(0,0,0,.7); color-scheme: dark;
+  }
+  :root[data-theme="light"] {
+    --bg:#eef0f3; --bg-grad-1:#f4f5f8; --bg-grad-2:#e4e7ec; --panel:#ffffff; --panel-2:#f3f5f8;
+    --edge:#d3d8e0; --edge-soft:#e2e6ec; --ink:#171b22; --ink-2:#4b5563; --ink-3:#8a94a3;
+    --accent:#b57400; --accent-dim:#d69b28; --jam:#d61f16; --mid:#cc8b00; --flow:#0f9d63;
+    --track:#cdd3dc; --shadow:0 18px 40px -22px rgba(30,40,60,.35); color-scheme: light;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background:
+      radial-gradient(1200px 700px at 78% -10%, var(--bg-grad-1), transparent 60%),
+      radial-gradient(900px 600px at 0% 110%, var(--bg-grad-2), transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 28px 22px 56px; }
+
+  /* ---- Header ---- */
+  header { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-bottom: 26px; }
+  .brand { display: flex; flex-direction: column; gap: 8px; }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--accent); font-weight: 700; display: flex; align-items: center; gap: 9px;
+  }
+  .eyebrow::before { content:""; width: 26px; height: 2px; background: var(--accent); display:inline-block; }
+  h1 {
+    font-size: clamp(28px, 4.4vw, 46px); font-weight: 800; letter-spacing: -.02em;
+    line-height: 1.02; text-wrap: balance;
+  }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { color: var(--ink-2); max-width: 60ch; font-size: 15px; }
+  .byline { font-size: 12.5px; color: var(--ink-3); letter-spacing: .02em; }
+  .byline b { color: var(--ink-2); font-weight: 600; }
+  .theme-btn {
+    border: 1px solid var(--edge); border-radius: 999px; padding: 9px 15px;
+    font-size: 12px; letter-spacing: .04em; color: var(--ink-2); background: var(--panel);
+    display: inline-flex; align-items: center; gap: 8px; transition: border-color .2s, color .2s;
+    white-space: nowrap;
+  }
+  .theme-btn:hover { border-color: var(--accent); color: var(--ink); }
+
+  /* ---- Layout ---- */
+  .grid { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; align-items: start; }
+  @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: linear-gradient(180deg, var(--panel), var(--panel-2));
+    border: 1px solid var(--edge); border-radius: 16px; box-shadow: var(--shadow);
+  }
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 15px 18px 12px;
+  }
+  .card-title { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+  .card-note { font-size: 12px; color: var(--ink-3); }
+
+  /* ---- Track (hero) ---- */
+  #trackWrap { padding: 6px 18px 18px; position: relative; }
+  #track { width: 100%; height: auto; display: block; }
+  .track-center {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; pointer-events: none; text-align: center;
+  }
+  .tc-val { font-size: clamp(30px, 6vw, 52px); font-weight: 800; letter-spacing: -.02em; font-variant-numeric: tabular-nums; line-height: 1; }
+  .tc-lab { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-3); margin-top: 8px; }
+  .tc-sub { font-size: 12px; color: var(--ink-2); margin-top: 12px; font-variant-numeric: tabular-nums; }
+
+  /* ---- Space-time ---- */
+  #stWrap { padding: 6px 18px 16px; }
+  #spacetime { width: 100%; height: 260px; display: block; border-radius: 8px; image-rendering: pixelated; background: var(--bg-grad-2); }
+  .st-axis { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--ink-3); margin-top: 8px; letter-spacing: .06em; }
+
+  /* ---- Metrics ---- */
+  .metrics { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 0 18px 18px; }
+  .metric { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 12px; padding: 13px 14px; }
+  .m-val { font-size: 25px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; line-height: 1; display: flex; align-items: baseline; gap: 5px; }
+  .m-unit { font-size: 12px; font-weight: 600; color: var(--ink-3); letter-spacing: 0; }
+  .m-lab { font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); margin-top: 8px; }
+
+  /* ---- Controls ---- */
+  .controls { padding: 4px 18px 20px; display: flex; flex-direction: column; gap: 18px; }
+  .ctrl { display: flex; flex-direction: column; gap: 9px; }
+  .ctrl-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .ctrl-name { font-size: 13px; font-weight: 600; color: var(--ink); }
+  .ctrl-hint { font-size: 11px; color: var(--ink-3); }
+  .ctrl-val { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); }
+  .ctrl-val span { font-size: 11px; color: var(--ink-3); font-weight: 600; margin-left: 2px; }
+  .ctrl-desc { font-size: 12px; color: var(--ink-3); line-height: 1.45; margin-top: 2px; }
+  .ctrl-desc b { color: var(--ink-2); font-weight: 600; }
+  .link-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--ink-2); cursor: pointer; user-select: none; margin-top: 3px; }
+  .link-toggle input { accent-color: var(--accent); width: 15px; height: 15px; cursor: pointer; flex: none; }
+  .link-toggle b { color: var(--ink); font-weight: 600; }
+  input[type="range"]:disabled { opacity: .45; }
+  input[type="range"]:disabled::-webkit-slider-thumb { background: var(--ink-3); box-shadow: none; }
+  input[type="range"]:disabled::-moz-range-thumb { background: var(--ink-3); box-shadow: none; }
+
+  input[type="range"] { width: 100%; height: 22px; background: transparent; }
+  input[type="range"]::-webkit-slider-runnable-track { height: 5px; border-radius: 999px; background: var(--edge); }
+  input[type="range"]::-moz-range-track { height: 5px; border-radius: 999px; background: var(--edge); }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 17px; height: 17px; border-radius: 50%;
+    background: var(--accent); border: 3px solid var(--panel); margin-top: -6px;
+    box-shadow: 0 0 0 1px var(--accent-dim); transition: transform .12s;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.15); }
+  input[type="range"]::-moz-range-thumb {
+    width: 17px; height: 17px; border-radius: 50%; background: var(--accent);
+    border: 3px solid var(--panel); box-shadow: 0 0 0 1px var(--accent-dim);
+  }
+  input[type="range"]:focus-visible { outline: none; }
+  input[type="range"]:focus-visible::-webkit-slider-thumb { box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 55%, transparent); }
+
+  .transport { display: flex; gap: 9px; padding: 2px 18px 20px; }
+  .btn {
+    flex: 1; border: 1px solid var(--edge); border-radius: 11px; padding: 11px 12px;
+    font-size: 13px; font-weight: 700; letter-spacing: .02em; color: var(--ink-2);
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--panel-2); transition: border-color .18s, color .18s, background .18s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--ink); }
+  .btn.primary { background: var(--accent); color: #17130a; border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.06); }
+
+  /* ---- Legend ---- */
+  .legend { display: flex; align-items: center; gap: 14px; padding: 0 18px 18px; flex-wrap: wrap; }
+  .lg-bar { flex: 1; min-width: 120px; height: 8px; border-radius: 999px;
+    background: linear-gradient(90deg, var(--jam), var(--mid), var(--flow)); }
+  .lg-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: var(--ink-2); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; }
+
+  /* ---- Explain / studies ---- */
+  .explain { margin-top: 18px; }
+  .explain-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 6px 18px 20px; }
+  @media (max-width: 720px) { .explain-grid { grid-template-columns: 1fr; } }
+  .ex-item h3 { font-size: 13px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .ex-num { font-size: 11px; color: var(--accent); font-variant-numeric: tabular-nums; font-weight: 800; }
+  .ex-item p { font-size: 13px; color: var(--ink-2); }
+  .studies { padding: 0 18px 20px; display: flex; flex-direction: column; gap: 10px; border-top: 1px solid var(--edge-soft); margin: 4px 18px 0; padding-top: 16px; }
+  .study { font-size: 12.5px; color: var(--ink-2); }
+  .study b { color: var(--ink); font-weight: 600; }
+  .study a { color: var(--accent); text-decoration: none; border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent); }
+  .study a:hover { border-bottom-color: var(--accent); }
+
+  /* ---- Fundamental diagram ---- */
+  #fdWrap { padding: 6px 18px 18px; }
+  #fd { width: 100%; height: auto; display: block; }
+  .fd-legend { display: flex; gap: 16px; padding: 0 18px 16px; flex-wrap: wrap; font-size: 11.5px; color: var(--ink-2); }
+  .fd-legend span { display: inline-flex; align-items: center; gap: 7px; }
+  .fd-swatch { width: 14px; height: 3px; border-radius: 2px; }
+
+  /* ---- Experiment 2: straight road ---- */
+  #roadWrap { padding: 16px 18px 8px; position: relative; }
+  #road { width: 100%; height: auto; display: block; border-radius: 10px; cursor: pointer; }
+  .road-hint {
+    position: absolute; top: 26px; left: 50%; transform: translateX(-50%);
+    font-size: 12.5px; font-weight: 600; color: var(--ink); background: var(--panel);
+    border: 1px solid var(--accent); padding: 7px 14px; border-radius: 999px;
+    pointer-events: none; transition: opacity .4s; box-shadow: var(--shadow);
+  }
+  #e2stWrap { padding: 4px 18px 12px; }
+  #roadST { width: 100%; height: 150px; display: block; border-radius: 8px; image-rendering: pixelated; background: var(--bg-grad-2); }
+  .e2-controls { display: flex; align-items: flex-end; gap: 14px; padding: 6px 18px 14px; flex-wrap: wrap; }
+  .e2-controls .btn { flex: none; }
+
+  /* ---- Experiment 3: A/B 110 vs 130 ---- */
+  .ab { display: grid; grid-template-columns: 1fr; gap: 14px; padding: 14px 18px 6px; }
+  .lane-block { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 12px; padding: 13px 15px; }
+  .lane-title { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; }
+  .lane-badge { font-size: 13px; font-weight: 800; padding: 4px 13px; border-radius: 999px; letter-spacing: .02em; }
+  .b110 { background: color-mix(in srgb, var(--flow) 20%, transparent); color: var(--flow); border: 1px solid var(--flow); }
+  .b130 { background: color-mix(in srgb, var(--jam) 18%, transparent); color: var(--jam); border: 1px solid var(--jam); }
+  .lane-sub { font-size: 11.5px; color: var(--ink-3); }
+  #road110, #road130 { width: 100%; height: auto; display: block; border-radius: 8px; }
+  .lane-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 11px; }
+  @media (max-width: 620px) { .lane-stats { grid-template-columns: repeat(2, 1fr); } }
+  .ls { text-align: center; }
+  .ls-v { font-size: 21px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .ls-v small { font-size: 12px; font-weight: 600; color: var(--ink-3); }
+  .ls-l { font-size: 10px; letter-spacing: .07em; text-transform: uppercase; color: var(--ink-3); margin-top: 5px; }
+  .ls-bad { color: var(--jam); }
+  .verdict { margin: 12px 18px; padding: 15px 17px; border-radius: 12px; border: 1px solid var(--accent);
+    background: color-mix(in srgb, var(--accent) 9%, transparent); font-size: 14px; line-height: 1.5; color: var(--ink); }
+  .verdict b { color: var(--accent); font-weight: 700; }
+  .safety { margin: 6px 18px 14px; }
+  .safety-head { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-bottom: 10px; }
+  .safety-head b { color: var(--ink-2); }
+  .safety-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  @media (max-width: 620px) { .safety-grid { grid-template-columns: repeat(2, 1fr); } }
+  .sf { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 11px; padding: 12px 13px; }
+  .sf-l { font-size: 11.5px; color: var(--ink-3); line-height: 1.3; min-height: 30px; }
+  .sf-nums { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+  .sf-a { font-size: 14px; color: var(--flow); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .sf-arrow { color: var(--ink-3); font-size: 12px; }
+  .sf-b { font-size: 22px; color: var(--jam); font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .sf-d { font-size: 12px; color: var(--jam); font-weight: 700; margin-top: 5px; }
+  /* accelerated-time accumulator */
+  .accum { margin: 8px 18px 14px; }
+  .odo { display: flex; align-items: baseline; gap: 14px; background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 11px; padding: 13px 16px; margin-bottom: 12px; flex-wrap: wrap; }
+  .odo-l { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; }
+  .odo-v { font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--accent); letter-spacing: -.01em; }
+  .odo-v small { font-size: 13px; color: var(--ink-3); font-weight: 600; }
+  .accum-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 620px) { .accum-grid { grid-template-columns: 1fr; } }
+  .acc-card { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 11px; padding: 13px 16px; }
+  .acc-t { font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .08em; font-weight: 700; margin-bottom: 9px; }
+  .acc-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 3px 0; }
+  .acc-110 { font-size: 13px; font-weight: 700; color: var(--flow); }
+  .acc-130 { font-size: 13px; font-weight: 700; color: var(--jam); }
+  .acc-n { font-size: 23px; font-weight: 800; font-variant-numeric: tabular-nums; letter-spacing: -.01em; }
+  .acc-n.bad { color: var(--jam); }
+  .acc-d { font-size: 12.5px; font-weight: 700; color: var(--jam); margin-top: 7px; min-height: 16px; }
+  .accum-note { font-size: 11.5px; color: var(--ink-3); margin-top: 11px; line-height: 1.45; }
+  .accum-note b { color: var(--ink-2); }
+
+  /* ---- Share ---- */
+  .share { display: flex; align-items: center; gap: 12px; padding: 16px 18px; flex-wrap: wrap; }
+  .share-lab { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-right: 2px; }
+  .share-btns { display: flex; gap: 9px; flex-wrap: wrap; }
+  .sbtn {
+    display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--edge);
+    border-radius: 10px; padding: 9px 14px; font-size: 13px; font-weight: 600; color: var(--ink-2);
+    background: var(--panel-2); transition: border-color .16s, color .16s, transform .12s;
+  }
+  .sbtn:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
+  .sbtn svg { width: 16px; height: 16px; fill: currentColor; }
+  .share-link { display: flex; align-items: center; gap: 12px; padding: 0 18px 14px; flex-wrap: wrap; }
+  .share-link .share-lab { margin-right: 0; }
+  .project-url {
+    display: inline-flex; align-items: center; gap: 9px; font-size: 14px; font-weight: 600;
+    color: var(--accent); text-decoration: none; border: 1px solid var(--edge); background: var(--panel-2);
+    border-radius: 10px; padding: 9px 14px; transition: border-color .16s, transform .12s;
+    word-break: break-all;
+  }
+  .project-url:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .project-url svg { width: 15px; height: 15px; fill: currentColor; flex: none; }
+  .share-note { font-size: 11.5px; color: var(--ink-3); padding: 0 18px 16px; max-width: 70ch; }
+  .toast {
+    position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(20px);
+    background: var(--accent); color: #17130a; font-weight: 700; font-size: 13px;
+    padding: 11px 18px; border-radius: 10px; box-shadow: var(--shadow); opacity: 0;
+    pointer-events: none; transition: opacity .2s, transform .2s; z-index: 50;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  footer { margin-top: 26px; text-align: center; font-size: 12px; color: var(--ink-3); }
+  footer b { color: var(--ink-2); font-weight: 600; }
+
+  .col { display: flex; flex-direction: column; gap: 18px; }
+
+  /* ---- Experiment guide ---- */
+  .guide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 26px; }
+  @media (max-width: 860px) { .guide { grid-template-columns: 1fr; } }
+  .guide .card { padding: 18px 20px; display: flex; flex-direction: column; gap: 9px; }
+  .g-tag { font-size: 10.5px; letter-spacing: .18em; text-transform: uppercase; font-weight: 800; color: var(--accent); }
+  .g-title { font-size: 18px; font-weight: 800; letter-spacing: -.01em; }
+  .g-desc { font-size: 13.5px; color: var(--ink-2); }
+  .g-how { font-size: 12.5px; color: var(--ink-3); display: flex; align-items: flex-start; gap: 8px; margin-top: 2px; }
+  .g-how b { color: var(--ink-2); font-weight: 600; }
+  .g-how::before { content: "▸"; color: var(--accent); font-size: 12px; line-height: 1.5; }
+
+  /* ---- Author bar ---- */
+  .author-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+    background: linear-gradient(180deg, var(--panel), var(--panel-2)); border: 1px solid var(--edge);
+    border-radius: 14px; padding: 14px 18px; margin-bottom: 22px; box-shadow: var(--shadow); }
+  .ab-left { display: flex; flex-direction: column; gap: 4px; min-width: 240px; }
+  .ab-name { font-size: 15px; color: var(--ink); }
+  .ab-name b { font-weight: 800; }
+  .ab-sub { font-size: 12px; color: var(--ink-3); line-height: 1.4; max-width: 62ch; }
+  .ab-social { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .ab-social .sc-lab { font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); font-weight: 700; margin-right: 2px; }
+  .soc { display: inline-flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 10px;
+    border: 1px solid var(--edge); background: var(--panel-2); color: var(--ink-2);
+    transition: border-color .16s, color .16s, transform .12s; }
+  .soc:hover { border-color: var(--accent); color: var(--ink); transform: translateY(-1px); }
+  .soc svg { width: 18px; height: 18px; fill: currentColor; }
+
+  /* ---- Verdict: who is to blame ---- */
+  .suspects { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; padding: 14px 18px 6px; }
+  @media (max-width: 760px) { .suspects { grid-template-columns: 1fr; } }
+  .suspect { background: var(--panel-2); border: 1px solid var(--edge-soft); border-radius: 12px; padding: 15px 16px; }
+  .susp-tag { font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; font-weight: 800; color: var(--ink-3); }
+  .susp-name { font-size: 16px; font-weight: 800; margin: 6px 0 9px; letter-spacing: -.01em; }
+  .susp-verdict { display: inline-block; font-size: 11.5px; font-weight: 800; padding: 4px 11px; border-radius: 999px; margin-bottom: 10px; }
+  .susp-verdict.cleared { color: var(--flow); background: color-mix(in srgb, var(--flow) 16%, transparent); border: 1px solid var(--flow); }
+  .susp-verdict.accomplice { color: var(--accent); background: color-mix(in srgb, var(--accent) 15%, transparent); border: 1px solid var(--accent); }
+  .susp-verdict.aggravating { color: var(--jam); background: color-mix(in srgb, var(--jam) 14%, transparent); border: 1px solid var(--jam); }
+  .suspect p { font-size: 13px; color: var(--ink-2); line-height: 1.46; }
+  .final-verdict { margin: 12px 18px 20px; padding: 17px 19px; }
+  .final-verdict .fv-q { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); font-weight: 800; margin-bottom: 7px; }
+  .final-verdict .fv-a { font-size: 15px; line-height: 1.55; color: var(--ink); }
+  .final-verdict .fv-a b { color: var(--accent); font-weight: 700; }
+
+  /* ---- Methodology disclaimer ---- */
+  .disclaimer { font-size: 12.5px; line-height: 1.55; color: var(--ink-2);
+    background: color-mix(in srgb, var(--flow) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--flow) 34%, transparent);
+    border-radius: 10px; padding: 13px 15px; margin-bottom: 14px; }
+  .disclaimer b { color: var(--ink); }
+
+  /* ---- Section label ---- */
+  .section-label { display: flex; align-items: baseline; gap: 14px; margin: 30px 0 14px; flex-wrap: wrap; }
+  .section-label .sl-num { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; }
+  .section-label h2 { font-size: 22px; font-weight: 800; letter-spacing: -.01em; }
+  .section-label .sl-sub { font-size: 13px; color: var(--ink-3); }
+
+  @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="eyebrow">Prometna dinamika &middot; Model Nagel–Schreckenberg</div>
+      <h1>Simulator <em>fantomskih</em> zastojev</h1>
+      <p class="lede">Ste že obtičali v koloni, ki se je čez nekaj minut sama razpustila &mdash; nikjer nesreče, gradbišča ali kakršne koli ovire? Doživeli ste <em>fantomski zastoj</em>. Nastane povsem sam od sebe: dovolj je, da en sam voznik za hip premočno zavre. Njegova motnja se prenese na vozilo zadaj, se pri vsakem naslednjem še okrepi in se sprevrže v gost sklop, ki počasi drsi <em>nazaj</em> po avtocesti &mdash; naravnost proti vam. Ko končno pripeljete do njega, vzroka ni več. Ostal je le duh davne zavore.</p>
+      <p class="lede">Spodnji trije poskusi pokažejo, <b>kako</b> tak zastoj vznikne, <b>kaj</b> ga sproži in <b>zakaj</b> nižja omejitev pomeni bolj tekoč in varnejši promet. Vse vrednosti so umerjene na realni slovenski avtocestni promet.</p>
+      <p class="byline">Poskus pripravil <b>Jan Macarol</b></p>
+    </div>
+    <button class="theme-btn" id="themeBtn" aria-label="Preklopi temo"><span id="themeIcon">&#9788;</span> <span id="themeTxt">Svetla tema</span></button>
+  </header>
+
+  <!-- AUTHOR BAR -->
+  <div class="author-bar">
+    <div class="ab-left">
+      <div class="ab-name">Avtor eksperimentov: <b>Jan Macarol</b></div>
+      <div class="ab-sub">Zasnovano po recenziranih znanstvenih raziskavah &mdash; Sugiyama (2008), Nagel&ndash;Schreckenberg (1992) in Nilsson&ndash;Elvik (potenčni model). Vse simulacije temeljijo izključno na podatkih študij in niso prirejene.</div>
+    </div>
+    <div class="ab-social" id="socialBar" aria-label="Družbeni kanali"></div>
+  </div>
+
+  <!-- GUIDE -->
+  <div class="guide">
+    <div class="card">
+      <span class="g-tag">Poskus 1</span>
+      <span class="g-title">Krožna proga</span>
+      <p class="g-desc">Vozila krožijo v zaprti zanki pri stalni gostoti &mdash; kot 22 avtomobilov v Sugiyamovem poskusu (2008). Nihče se ne zaleti, a promet vseeno razpade sam od sebe.</p>
+      <span class="g-how"><span><b>Kaj storiti:</b> premikajte štiri drsnike in opazujte, kdaj se pojavijo temne diagonale na časovnem diagramu &mdash; to so fantomski zastoji.</span></span>
+    </div>
+    <div class="card">
+      <span class="g-tag">Poskus 2</span>
+      <span class="g-title">En avto zavre</span>
+      <p class="g-desc">Raven kilometer ceste brez naključnih motenj &mdash; promet bi tekel v nedogled. Dokler ne posežete vmes vi.</p>
+      <span class="g-how"><span><b>Kaj storiti:</b> <b>kliknite na vozilo</b>, da ga za trenutek ustavite. Za njim nastane kolona, ki ostane in potuje nazaj &mdash; tudi ko vaše vozilo že odpelje.</span></span>
+    </div>
+    <div class="card">
+      <span class="g-tag">Poskus 3</span>
+      <span class="g-title">110 proti 130</span>
+      <p class="g-desc">Dve enaki cesti, ista gostota &mdash; le omejitev je drugačna. Pošteno: v gostem prometu je potovalni čas skoraj enak.</p>
+      <span class="g-how"><span><b>Kaj opazovati:</b> pretok se skoraj ne razlikuje, a <b>varnost dramatično</b> &mdash; po Nilssonu ima 130 <b>+40 % nesreč in +95 % smrtnih</b>. To je pravi razlog za nižjo omejitev.</span></span>
+    </div>
+  </div>
+
+  <div class="section-label">
+    <span class="sl-num">Poskus 1</span>
+    <h2>Krožna proga</h2>
+    <span class="sl-sub">3,0 km zaprta zanka &middot; privzeto: slovenska avtocesta v gostem prometu</span>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: visualizations -->
+    <div class="col">
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Krožna proga &middot; 3,0 km</span>
+          <span class="card-note" id="carsNote">&mdash; vozil</span>
+        </div>
+        <div id="trackWrap">
+          <canvas id="track" width="620" height="620"></canvas>
+          <div class="track-center">
+            <div class="tc-val" id="ctrSpeed">0</div>
+            <div class="tc-lab">povprečna hitrost &middot; km/h</div>
+            <div class="tc-sub" id="ctrSub">t = 0 s</div>
+          </div>
+        </div>
+        <div class="legend">
+          <span class="lg-item"><span class="dot" style="background:var(--jam)"></span>ustavljeno</span>
+          <span class="lg-bar"></span>
+          <span class="lg-item"><span class="dot" style="background:var(--flow)"></span>prost tok</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">Prostorsko-časovni diagram</span>
+          <span class="card-note">temne diagonale = valovi zastoja, ki potujejo nazaj</span>
+        </div>
+        <div id="stWrap">
+          <canvas id="spacetime" width="600" height="260"></canvas>
+          <div class="st-axis"><span>&larr; smer vožnje &middot; položaj po cesti</span><span>čas &darr;</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: metrics + controls -->
+    <div class="col">
+      <div class="card">
+        <div class="card-head"><span class="card-title">Meritve v živo</span></div>
+        <div class="metrics">
+          <div class="metric"><div class="m-val" id="mSpeed">0<span class="m-unit">km/h</span></div><div class="m-lab">Povpr. hitrost</div></div>
+          <div class="metric"><div class="m-val" id="mFlow">0<span class="m-unit">voz/h</span></div><div class="m-lab">Pretok</div></div>
+          <div class="metric"><div class="m-val" id="mJams">0<span class="m-unit"></span></div><div class="m-lab">Zastoji</div></div>
+          <div class="metric"><div class="m-val" id="mStop">0<span class="m-unit">%</span></div><div class="m-lab">Ustavljenih</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-title">Parametri</span></div>
+        <div class="controls">
+          <div class="ctrl">
+            <div class="ctrl-top">
+              <div><div class="ctrl-name">Hitrost</div><div class="ctrl-hint">omejitev oz. želena hitrost vozil</div></div>
+              <div class="ctrl-val" id="vSpeed">130<span>km/h</span></div>
+            </div>
+            <input type="range" id="sSpeed" min="40" max="160" step="10" value="130">
+            <div class="ctrl-desc">Najvišja hitrost, ki jo vozniki poskušajo doseči. <b>Realno v SLO:</b> avtocesta 130, hitra cesta 110, izven naselij 90, v naselju 50 km/h. Višja hitrost pomeni večje razdalje &mdash; a tudi hitrejše širjenje motenj.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="ctrl-top">
+              <div><div class="ctrl-name">Verjetnost dogodka</div><div class="ctrl-hint">naključno mikro-zaviranje / nepozornost</div></div>
+              <div class="ctrl-val" id="vProb">11<span>%</span></div>
+            </div>
+            <input type="range" id="sProb" min="0" max="50" step="1" value="11" disabled>
+            <label class="link-toggle"><input type="checkbox" id="linkProb" checked> <span>Sklopi s hitrostjo <b>(Nilsson: dogodki &prop; hitrost&sup2;)</b></span></label>
+            <div class="ctrl-desc">Verjetnost, da voznik v vsaki sekundi brez potrebe zavre &mdash; <b>vzrok fantomskih zastojev</b>. Ko je sklopljeno, se samodejno spreminja s hitrostjo po potenčnem modelu: <b>90&nbsp;→&nbsp;5&nbsp;%, 110&nbsp;→&nbsp;8&nbsp;%, 130&nbsp;→&nbsp;11&nbsp;%, 150&nbsp;→&nbsp;15&nbsp;%</b>. Odklenite kljukico za ročno nastavitev.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="ctrl-top">
+              <div><div class="ctrl-name">Jakost zaviranja</div><div class="ctrl-hint">kako močno voznik pretirano zavre</div></div>
+              <div class="ctrl-val" id="vBrake">1<span>× stopnja</span></div>
+            </div>
+            <input type="range" id="sBrake" min="1" max="3" step="1" value="1">
+            <div class="ctrl-desc">Prereakcija ob dogodku. <b>1</b> = blaga zavora (~27 km/h manj), <b>3</b> = sunkovito zaviranje (~80 km/h manj). Močnejše zaviranje sproža večje in trajnejše kolone.</div>
+          </div>
+
+          <div class="ctrl">
+            <div class="ctrl-top">
+              <div><div class="ctrl-name">Gostota prometa</div><div class="ctrl-hint">število vozil na kilometer pasu</div></div>
+              <div class="ctrl-val" id="vDens">30<span>voz/km</span></div>
+            </div>
+            <input type="range" id="sDens" min="5" max="120" step="1" value="30">
+            <div class="ctrl-desc">Koliko vozil je na kilometru. <b>Realno:</b> prost promet &lt;20, gost 25&ndash;40, zastoj &gt;60, polna kolona ~133 voz/km (odbijač ob odbijač). Nad kritično gostoto pretok pade &mdash; glej temeljni diagram spodaj.</div>
+          </div>
+        </div>
+        <div class="transport">
+          <button class="btn primary" id="playBtn">&#9613;&#9613; Pavza</button>
+          <button class="btn" id="resetBtn">&#8635; Ponastavi</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><span class="card-title">Hitrost simulacije</span><span class="card-note" id="rateNote">10 korakov/s</span></div>
+        <div class="controls" style="padding-bottom:20px">
+          <div class="ctrl">
+            <input type="range" id="sRate" min="1" max="30" step="1" value="10">
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FUNDAMENTAL DIAGRAM -->
+  <div class="card" style="margin-top:18px">
+    <div class="card-head">
+      <span class="card-title">Temeljni diagram &middot; pretok proti gostoti</span>
+      <span class="card-note">krivulja za trenutne parametre; točka je vaše stanje v živo</span>
+    </div>
+    <div id="fdWrap"><canvas id="fd" width="960" height="340"></canvas></div>
+    <div class="fd-legend">
+      <span><span class="fd-swatch" style="background:var(--accent)"></span>zmogljivost krivulje</span>
+      <span><span class="fd-swatch" style="background:var(--flow);height:10px;width:10px;border-radius:50%"></span>trenutno stanje (v živo)</span>
+      <span><span class="fd-swatch" style="background:var(--jam);height:10px;width:2px"></span>kritična gostota (vrh)</span>
+    </div>
+  </div>
+
+  <!-- EXPERIMENT 2: single-car stop -->
+  <div class="section-label">
+    <span class="sl-num">Poskus 2</span>
+    <h2>Kolona zaradi enega vozila</h2>
+    <span class="sl-sub">raven kilometer &middot; brez naključnih motenj &middot; edini vzrok ste vi</span>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Klikni in ustavi vozilo</span>
+      <span class="card-note" id="e2Note">&mdash; vozil</span>
+    </div>
+    <div id="roadWrap">
+      <canvas id="road" width="1000" height="120"></canvas>
+      <div class="road-hint" id="roadHint">👆 Kliknite na vozilo, da ga za trenutek ustavite</div>
+    </div>
+    <div id="e2stWrap">
+      <canvas id="roadST" width="1000" height="150"></canvas>
+      <div class="st-axis"><span>&larr; smer vožnje &middot; položaj (1 km)</span><span>čas &darr;</span></div>
+    </div>
+    <div class="e2-controls">
+      <div class="ctrl" style="flex:1; min-width:220px">
+        <div class="ctrl-top">
+          <div class="ctrl-name">Gostota prometa</div>
+          <div class="ctrl-val" id="e2vDens">32<span>voz/km</span></div>
+        </div>
+        <input type="range" id="e2Dens" min="8" max="80" step="1" value="32">
+      </div>
+      <button class="btn" id="e2Stop">&#9211; Ustavi naključno vozilo</button>
+      <button class="btn" id="e2Reset">&#8635; Ponastavi</button>
+    </div>
+    <p class="share-note">Tu ni naključnih dogodkov (verjetnost je 0 %), zato bi promet tekel v nedogled &mdash; edini vzrok kolone je vaš klik. Opazujte: val zastoja potuje <b>nazaj</b> po cesti pri ~15 km/h in ostane, čeprav vaše vozilo že dolgo vozi naprej. Prav to se dogaja na avtocesti, ko en voznik sunkovito zavre.</p>
+  </div>
+
+  <!-- EXPERIMENT 3: 110 vs 130 A/B -->
+  <div class="section-label">
+    <span class="sl-num">Poskus 3</span>
+    <h2>Zakaj 110 namesto 130</h2>
+    <span class="sl-sub">v gostem prometu enak potovalni čas &middot; a zelo različno tveganje</span>
+  </div>
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">A/B primerjava &middot; učinek reakcijskega časa</span>
+      <span class="card-note" id="e3Note">&mdash;</span>
+    </div>
+    <div class="ab">
+      <div class="lane-block">
+        <div class="lane-title"><span class="lane-badge b110">110 km/h</span><span class="lane-sub">nižja omejitev</span></div>
+        <canvas id="road110" width="1000" height="64"></canvas>
+        <div class="lane-stats">
+          <div class="ls"><div class="ls-v" id="s110speed">&ndash;</div><div class="ls-l">potovalna hitrost</div></div>
+          <div class="ls"><div class="ls-v" id="s110jam">&ndash;</div><div class="ls-l">% časa v koloni</div></div>
+          <div class="ls"><div class="ls-v" id="s110ev">&ndash;</div><div class="ls-l">dogodki / 100 km</div></div>
+          <div class="ls"><div class="ls-v" id="s110stop">&ndash;</div><div class="ls-l">popolne zaustavitve / 100 km</div></div>
+        </div>
+      </div>
+      <div class="lane-block">
+        <div class="lane-title"><span class="lane-badge b130">130 km/h</span><span class="lane-sub">višja omejitev</span></div>
+        <canvas id="road130" width="1000" height="64"></canvas>
+        <div class="lane-stats">
+          <div class="ls"><div class="ls-v" id="s130speed">&ndash;</div><div class="ls-l">potovalna hitrost</div></div>
+          <div class="ls"><div class="ls-v" id="s130jam">&ndash;</div><div class="ls-l">% časa v koloni</div></div>
+          <div class="ls"><div class="ls-v" id="s130ev">&ndash;</div><div class="ls-l">dogodki / 100 km</div></div>
+          <div class="ls"><div class="ls-v" id="s130stop">&ndash;</div><div class="ls-l">popolne zaustavitve / 100 km</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="verdict" id="e3Verdict">Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)</div>
+
+    <div class="accum">
+      <div class="safety-head">Skozi čas se razlika nabere &mdash; nesreče na prevožene kilometre <b>(pospešeni čas)</b></div>
+      <div class="odo">
+        <span class="odo-l">simulirani promet</span>
+        <span class="odo-v"><span id="odoKm">0</span> <small>vozil-km</small></span>
+      </div>
+      <div class="accum-grid">
+        <div class="acc-card">
+          <div class="acc-t">Nesreče s poškodbami</div>
+          <div class="acc-row"><span class="acc-110">omejitev 110</span><span class="acc-n" id="acc110">0</span></div>
+          <div class="acc-row"><span class="acc-130">omejitev 130</span><span class="acc-n bad" id="acc130">0</span></div>
+          <div class="acc-d" id="accDelta">&nbsp;</div>
+        </div>
+        <div class="acc-card">
+          <div class="acc-t">Smrtne nesreče</div>
+          <div class="acc-row"><span class="acc-110">omejitev 110</span><span class="acc-n" id="fat110">0</span></div>
+          <div class="acc-row"><span class="acc-130">omejitev 130</span><span class="acc-n bad" id="fat130">0</span></div>
+          <div class="acc-d" id="fatDelta">&nbsp;</div>
+        </div>
+      </div>
+      <div class="accum-note">Osnovna stopnja nesreč je ilustrativna (reda velikosti za avtoceste); znanstveni del je <b>razmerje</b> iz Nilssonovega modela: pri 130 proti 110 je nesreč s poškodbami <b>&times;1,40</b>, smrtnih pa <b>&times;1,95</b>. Čim več kilometrov se prevozi, tem bolj očitna postane razlika &mdash; enak čas prihoda, a vse več ponesrečenih.</div>
+    </div>
+
+    <div class="safety">
+      <div class="safety-head">Stopnje pri isti vožnji &mdash; potenčni model <b>(Nilsson)</b></div>
+      <div class="safety-grid">
+        <div class="sf">
+          <div class="sf-l">Nesreče s poškodbami <span style="opacity:.7">(&prop; hitrost²)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;100</span><span class="sf-arrow">&rarr;</span><span class="sf-b">140</span></div>
+          <div class="sf-d">+40 % pri 130</div>
+        </div>
+        <div class="sf">
+          <div class="sf-l">Smrtne nesreče <span style="opacity:.7">(&prop; hitrost⁴)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;100</span><span class="sf-arrow">&rarr;</span><span class="sf-b">195</span></div>
+          <div class="sf-d">+95 % pri 130</div>
+        </div>
+        <div class="sf">
+          <div class="sf-l">Zavorna pot <span style="opacity:.7">(reakcija + zaviranje)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;97&nbsp;m</span><span class="sf-arrow">&rarr;</span><span class="sf-b">129&nbsp;m</span></div>
+          <div class="sf-d">+32 m daljša pri 130</div>
+        </div>
+        <div class="sf">
+          <div class="sf-l">Energija ob trku <span style="opacity:.7">(&prop; hitrost²)</span></div>
+          <div class="sf-nums"><span class="sf-a">110&nbsp;→&nbsp;100</span><span class="sf-arrow">&rarr;</span><span class="sf-b">140</span></div>
+          <div class="sf-d">+40 % pri 130</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="e2-controls">
+      <div class="ctrl" style="flex:1; min-width:220px">
+        <div class="ctrl-top">
+          <div class="ctrl-name">Gostota prometa (obe cesti)</div>
+          <div class="ctrl-val" id="e3vDens">20<span>voz/km</span></div>
+        </div>
+        <input type="range" id="e3Dens" min="12" max="45" step="1" value="20">
+      </div>
+      <button class="btn" id="e3Reset">&#8635; Ponastavi meritve</button>
+    </div>
+    <p class="share-note"><b>Pošten sklep.</b> Na enem pasu 110 in 130 v <b>pretoku skoraj ne razlikujeta</b>: v prostem prometu obe tečeta gladko (130 le hitreje), v gostem prometu pa sta obe omejeni z razmikom in se izenačita &mdash; zato v koloni z višjo hitrostjo ne prihranite časa. Prava razlika je v <b>varnosti</b>: pogostost nesreč raste s kvadratom hitrosti, smrtnih pa s četrto potenco (Nilssonov potenčni model). Pri 130 namesto 110 to pomeni <b>+40 % nesreč s poškodbami in +95 % smrtnih nesreč</b> &mdash; za enak čas prihoda. To je pravi, znanstveni razlog za nižjo omejitev. (Verjetnost dogodka v simulaciji raste kvadratno s hitrostjo, skladno z istim modelom.)</p>
+  </div>
+
+  <!-- EXPLAIN -->
+  <div class="card explain" style="margin-top:18px">
+    <div class="card-head"><span class="card-title">Kako nastane fantomski zastoj</span></div>
+    <div class="explain-grid">
+      <div class="ex-item">
+        <h3><span class="ex-num">01</span> Drobna motnja</h3>
+        <p>Dovolj je malenkost: voznik za trenutek popusti plin ali rahlo pritisne zavoro &mdash; pogosto brez pravega razloga. Pri gostem prometu je razmik premajhen, da bi to napako požrl.</p>
+      </div>
+      <div class="ex-item">
+        <h3><span class="ex-num">02</span> Ojačanje</h3>
+        <p>Voznik za njim rdeče luči opazi z zamikom, zato zavre močneje, kot bi bilo treba. Naslednji stori isto, le še malo bolj &mdash; motnja z vsakim vozilom raste namesto da bi pojenjala.</p>
+      </div>
+      <div class="ex-item">
+        <h3><span class="ex-num">03</span> Val nazaj</h3>
+        <p>Iz drobne zavore nastane gost sklop vozil, ki drsi <b>nazaj</b> po koloni s približno 15 km/h. Ko pridete vanj, ni ne ovire ne krivca &mdash; le sled zavore izpred nekaj minut.</p>
+      </div>
+    </div>
+    <div class="studies">
+      <div class="disclaimer"><b>Metodološka izjava.</b> Vse tri simulacije so zgrajene <b>izključno na podatkih in razmerjih iz spodaj navedenih recenziranih raziskav</b> in <b>niso prirejene</b> za vnaprej želen rezultat. Kjer razlike ni (npr. potovalni čas 110 proti 130 v gostem prometu), simulator to pošteno pokaže; kjer je (varnostna razmerja), izhaja neposredno iz objavljenih koeficientov. Edina ilustrativna vrednost je <b>absolutna</b> osnovna stopnja nesreč v panelu »Skozi čas« (red velikosti za avtoceste) &mdash; medtem ko so <b>razmerja</b> (&times;1,40 nesreč, &times;1,95 smrtnih) neposredno iz Nilssonovega modela.</div>
+      <div class="study"><b>Sugiyama et al. (2008)</b> &mdash; <i>osnova Poskusa 1.</i> Poskus s 22 vozili na 230 m krožni progi; vozniki vzdržujejo ~30 km/h. Iz drobnih nihanj spontano nastane zastoj brez ovire, ki potuje nazaj &mdash; nad kritično gostoto je prosti tok nestabilen. <a href="https://iopscience.iop.org/article/10.1088/1367-2630/10/3/033001" target="_blank" rel="noopener">New J. Phys. 10, 033001</a></div>
+      <div class="study"><b>Nagel &amp; Schreckenberg (1992)</b> &mdash; <i>računski model vseh treh poskusov.</i> Celularni avtomat s štirimi pravili na korak: (1) pospešek, (2) varnostno zaviranje na razmik, (3) naključno zaviranje z verjetnostjo <i>p</i>, (4) premik. Celica 7,5 m, korak 1 s. <a href="https://hal.science/jpa-00246697/document" target="_blank" rel="noopener">J. Phys. I France 2, 2221</a></div>
+      <div class="study"><b>Nilsson (2004) &middot; Elvik (2009) &mdash; potenčni model</b> &mdash; <i>osnova sklopitve hitrost&ndash;dogodek in varnostne table.</i> Pogostost nesreč raste s potenco hitrosti: poškodbe &prop; v&sup2; (eksponent 2), hude &prop; v&sup3;, smrtne &prop; v&#8308;. Empirično iz švedskih sprememb omejitev, velja za avtoceste. Uporabljena razmerja: (130/110)&sup2; = <b>1,40</b>, (130/110)&#8308; = <b>1,95</b>. <a href="https://www.sciencedirect.com/science/article/abs/pii/S000145751000148X" target="_blank" rel="noopener">Elvik, Accid. Anal. Prev. (2010)</a></div>
+      <div class="study"><b>Flynn, Kasimov, Nave, Rosales &amp; Seibold (MIT)</b> &mdash; teoretična potrditev: &raquo;jamitoni&laquo; so potujoči valovi zastoja, ki nastanejo tudi ko vsi vozniki upoštevajo povsem enaka pravila. <a href="https://math.mit.edu/traffic/" target="_blank" rel="noopener">math.mit.edu/traffic</a></div>
+    </div>
+  </div>
+
+  <!-- VERDICT: who is to blame -->
+  <div class="section-label" style="margin-top:34px">
+    <span class="sl-num">Razsodba</span>
+    <h2>Kdo je torej kriv?</h2>
+    <span class="sl-sub">trije osumljenci, trije poskusi</span>
+  </div>
+
+  <div class="card">
+    <div class="suspects">
+      <div class="suspect">
+        <div class="susp-tag">Osumljenec 1 &middot; Poskus 2</div>
+        <div class="susp-name">Voznik, ki je zaviral</div>
+        <div class="susp-verdict cleared">Sprožilec, ne krivec</div>
+        <p>En sam voznik res sproži kolono. A pri gostem prometu bi jo prej ali slej sprožil kdorkoli &mdash; zaviranje je le iskra, ne pravi vzrok.</p>
+      </div>
+      <div class="suspect">
+        <div class="susp-tag">Osumljenec 2 &middot; Poskus 1</div>
+        <div class="susp-name">Gostota prometa</div>
+        <div class="susp-verdict accomplice">Sokrivec</div>
+        <p>Nad kritično gostoto postane prosti tok nestabilen. Šele gneča omogoči, da se drobna motnja ojači v val. Brez nje zastoja ni.</p>
+      </div>
+      <div class="suspect">
+        <div class="susp-tag">Osumljenec 3 &middot; Poskus 3</div>
+        <div class="susp-name">Previsoka hitrost</div>
+        <div class="susp-verdict aggravating">Oteževalna okoliščina</div>
+        <p>Hitrost sama zastoja ne povzroči (pretok 110 &asymp; 130), a po Nilssonu močno poveča tveganje in ostrino dogodkov &mdash; +40 % nesreč.</p>
+      </div>
+    </div>
+    <div class="verdict final-verdict">
+      <div class="fv-q">Razsodba</div>
+      <div class="fv-a">Pravi krivec ni posamezen voznik, ampak <b>človeški reakcijski čas v gostem prometu</b>. Fantomski zastoj nastane iz <b>kolektivne dinamike</b>: vsak od nas z majhnim zamikom in kančkom prevelikega zaviranja doda svoj kamenček. <b>Nihče posamič &mdash; vsi skupaj.</b> Zato ne pomaga iskanje krivca, ampak umirjena, nižja hitrost in večji razmik.</div>
+    </div>
+  </div>
+
+  <!-- SHARE -->
+  <div class="card" style="margin-top:18px">
+    <div class="card-head"><span class="card-title">Deli poskus</span><span class="card-note">razširi med prijatelje in kolege</span></div>
+    <div class="share">
+      <span class="share-lab">Deli na</span>
+      <div class="share-btns">
+        <button class="sbtn" id="shFb" aria-label="Deli na Facebooku"><svg viewBox="0 0 24 24"><path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/></svg>Facebook</button>
+        <button class="sbtn" id="shX" aria-label="Deli na X"><svg viewBox="0 0 24 24"><path d="M18.9 2H22l-7.1 8.1L23 22h-6.6l-5.2-6.8L5.3 22H2.1l7.6-8.7L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.1 3.9H5.2L17.7 20Z"/></svg>X</button>
+        <button class="sbtn" id="shLi" aria-label="Deli na LinkedInu"><svg viewBox="0 0 24 24"><path d="M20.4 3H3.6A.6.6 0 0 0 3 3.6v16.8a.6.6 0 0 0 .6.6h16.8a.6.6 0 0 0 .6-.6V3.6a.6.6 0 0 0-.6-.6ZM8.3 18.3H5.6V9.7h2.7v8.6ZM7 8.5a1.6 1.6 0 1 1 0-3.1 1.6 1.6 0 0 1 0 3.1Zm11.3 9.8h-2.7v-4.2c0-1 0-2.3-1.4-2.3s-1.6 1.1-1.6 2.2v4.3h-2.7V9.7h2.6v1.2h.1a2.9 2.9 0 0 1 2.6-1.4c2.8 0 3.3 1.8 3.3 4.2v4.6Z"/></svg>LinkedIn</button>
+        <button class="sbtn" id="shWa" aria-label="Deli na WhatsAppu"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.5 15.2L2 22l4.9-1.3A10 10 0 1 0 12 2Zm5.8 14.1c-.2.7-1.4 1.3-2 1.4-.5.1-1.2.1-1.9-.1-.4-.1-1-.3-1.7-.6-3-1.3-4.9-4.3-5-4.5-.2-.2-1.3-1.7-1.3-3.3s.8-2.3 1.1-2.6c.3-.3.6-.4.8-.4h.6c.2 0 .4 0 .7.5l.9 2.1c.1.2.1.4 0 .6l-.4.6-.4.4c-.2.2-.3.3-.1.6.2.3.9 1.4 1.9 2.3 1.3 1.1 2.3 1.5 2.6 1.6.3.1.5.1.7-.1l.9-1.1c.2-.3.4-.2.7-.1l2 1c.3.1.5.2.5.4.1.1.1.7-.1 1.4Z"/></svg>WhatsApp</button>
+        <button class="sbtn" id="shCopy" aria-label="Kopiraj povezavo"><svg viewBox="0 0 24 24"><path d="M16 1H4a2 2 0 0 0-2 2v12h2V3h12V1Zm3 4H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2Zm0 16H8V7h11v14Z"/></svg>Kopiraj povezavo</button>
+      </div>
+    </div>
+    <div class="share-link">
+      <span class="share-lab">Povezava</span>
+      <a class="project-url" id="projectUrl" href="https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M10.6 13.4a1 1 0 0 0 1.4 0l5-5a3.5 3.5 0 0 0-5-5l-2 2a1 1 0 1 0 1.4 1.5l2-2a1.5 1.5 0 0 1 2.1 2.1l-5 5a1 1 0 0 0 0 1.4Zm2.8-2.8a1 1 0 0 0-1.4 0l-5 5a3.5 3.5 0 0 0 5 5l2-2a1 1 0 1 0-1.4-1.5l-2 2a1.5 1.5 0 0 1-2.1-2.1l5-5a1 1 0 0 0 0-1.4Z"/></svg><span id="projectUrlTxt">janmacarolvrabec.github.io/Traffic-Jam-Simulator</span></a>
+    </div>
+    <p class="share-note" id="shareNote">Povezava za deljenje se pripravi samodejno. Za lepo predogledno sličico (naslov + slika) na Facebooku in X objavite datoteko na spletu (npr. GitHub Pages) &mdash; oznake Open Graph in slika <code>og-image.png</code> so že vključene.</p>
+  </div>
+
+  <footer>Poskus pripravil <b>Jan Macarol</b> &middot; Model: Nagel–Schreckenberg (celularni avtomat) &middot; celica 7,5 m &middot; korak 1 s &middot; obroč 3,0 km z zaprto zanko</footer>
+  <div class="toast" id="toast">Povezava kopirana</div>
+</div>
+
+<script>
+(() => {
+  "use strict";
+
+  // ---------- Model constants ----------
+  const CELL_M   = 7.5;          // meters per cell
+  const DT_S     = 1;            // seconds per step
+  const ROAD_CELLS = 400;        // 400 * 7.5 m = 3.0 km ring
+  const ROAD_KM  = ROAD_CELLS * CELL_M / 1000;
+  const KMH_PER_CELL = CELL_M / DT_S * 3.6;   // one cell/step in km/h (=27)
+
+  // ---------- State ----------
+  // Defaults calibrated to a busy Slovenian motorway lane:
+  // 130 km/h limit, ~10% driver imperfection, gentle braking, dense-but-flowing traffic.
+  const P = {
+    vmax: 5,       // cells/step (~130-135 km/h)
+    prob: 0.10,    // slowdown probability (realistic 5-15%)
+    brake: 1,      // cells removed on a slowdown event (gentle)
+    density: 30,   // veh/km (heavy motorway traffic, near breakdown)
+    rate: 10       // steps per second
+  };
+  let cars = [];   // {pos, v} sorted ascending by pos
+  let t = 0;
+  let running = true;
+
+  // ---------- Elements ----------
+  const $ = id => document.getElementById(id);
+  const track = $("track"), tctx = track.getContext("2d");
+  const st = $("spacetime"), sctx = st.getContext("2d");
+  const stW = st.width, stH = st.height;
+  const fd = $("fd"), fctx = fd.getContext("2d");
+  const fdW = fd.width, fdH = fd.height;
+  let fdPts = [];            // {d, q} sampled fundamental-diagram curve
+  let fdCrit = { d:0, q:0 }; // peak (critical density / capacity)
+  let fdChangeAt = 1;        // debounce marker; 1 = compute on first frame
+
+  // ---------- Colour ramp: jam(red) -> mid(amber) -> flow(green) ----------
+  function speedColor(frac) {
+    frac = Math.max(0, Math.min(1, frac));
+    // stops: red #ff3b30, amber #ffb400, green #34d399
+    const stops = [ [255,59,48], [255,180,0], [52,211,153] ];
+    const s = frac * 2, i = Math.min(1, Math.floor(s)), f = s - i;
+    const a = stops[i], b = stops[i+1];
+    return [ Math.round(a[0]+(b[0]-a[0])*f), Math.round(a[1]+(b[1]-a[1])*f), Math.round(a[2]+(b[2]-a[2])*f) ];
+  }
+  const rgb = c => `rgb(${c[0]},${c[1]},${c[2]})`;
+
+  // ---------- Build / reset ----------
+  function build() {
+    const n = Math.max(1, Math.min(ROAD_CELLS - 1, Math.round(P.density * ROAD_KM)));
+    cars = [];
+    // even spacing around the ring
+    for (let i = 0; i < n; i++) {
+      cars.push({ pos: Math.floor(i * ROAD_CELLS / n), v: P.vmax });
+    }
+    dedupe();
+    t = 0;
+    clearSpacetime();
+    $("carsNote").textContent = n + " vozil";
+  }
+  // ensure unique ascending positions (guards rounding collisions)
+  function dedupe() {
+    cars.sort((a,b) => a.pos - b.pos);
+    for (let i = 1; i < cars.length; i++) {
+      if (cars[i].pos <= cars[i-1].pos) cars[i].pos = cars[i-1].pos + 1;
+    }
+    // wrap guard
+    if (cars.length && cars[cars.length-1].pos >= ROAD_CELLS) {
+      // fall back to strict even spacing if we overflowed
+      const n = cars.length;
+      for (let i = 0; i < n; i++) cars[i].pos = Math.floor(i * ROAD_CELLS / n);
+    }
+  }
+
+  // ---------- One Nagel–Schreckenberg step ----------
+  function step() {
+    const n = cars.length;
+    if (n === 0) return;
+    // gap to the car ahead (cars sorted ascending, ring topology)
+    for (let i = 0; i < n; i++) {
+      const cur = cars[i];
+      const ahead = cars[(i + 1) % n];
+      let gap = ahead.pos - cur.pos - 1;
+      if (gap < 0) gap += ROAD_CELLS;            // wrap for the last car
+      // 1. accelerate
+      let v = Math.min(cur.v + 1, P.vmax);
+      // 2. brake for safety
+      if (v > gap) v = gap;
+      // 3. random slowdown (the phantom-jam nucleus)
+      if (v > 0 && Math.random() < P.prob) v = Math.max(v - P.brake, 0);
+      cur.nv = v;
+    }
+    // 4. move
+    for (let i = 0; i < n; i++) {
+      cars[i].v = cars[i].nv;
+      cars[i].pos = (cars[i].pos + cars[i].v) % ROAD_CELLS;
+    }
+    cars.sort((a,b) => a.pos - b.pos);
+    t += DT_S;
+    pushSpacetimeRow();
+  }
+
+  // ---------- Metrics ----------
+  function metrics() {
+    const n = cars.length;
+    if (!n) return { speed:0, flow:0, jams:0, stopped:0 };
+    let sum = 0, stopped = 0;
+    for (const c of cars) { sum += c.v; if (c.v === 0) stopped++; }
+    const meanCells = sum / n;
+    const speed = meanCells * KMH_PER_CELL;
+    const density = n / ROAD_KM;
+    const flow = density * speed;              // q = rho * v  (veh/h)
+    // count jam clusters: runs of consecutive occupied cells that contain a stopped/very-slow car
+    let jams = 0, inJam = false;
+    // build occupancy scan in position order
+    for (let i = 0; i < n; i++) {
+      const c = cars[i];
+      const prev = cars[(i - 1 + n) % n];
+      let gap = c.pos - prev.pos - 1; if (gap < 0) gap += ROAD_CELLS;
+      const dense = gap <= 1;                   // bumper-to-bumper with car behind
+      const slow = c.v <= 1;
+      if (dense && slow) {
+        if (!inJam) { jams++; inJam = true; }
+      } else if (gap > 2) {
+        inJam = false;
+      }
+    }
+    return { speed, flow, jams, stopped: stopped / n * 100 };
+  }
+
+  // ---------- Space-time waterfall ----------
+  let stRow;
+  function clearSpacetime() {
+    sctx.fillStyle = getVar("--bg-grad-2");
+    sctx.fillRect(0, 0, stW, stH);
+  }
+  function pushSpacetimeRow() {
+    // scroll up by 1px
+    sctx.drawImage(st, 0, 1, stW, stH - 1, 0, 0, stW, stH - 1);
+    // draw newest row at the bottom
+    const y = stH - 1;
+    const bg = getVar("--bg-grad-2");
+    sctx.fillStyle = bg;
+    sctx.fillRect(0, y, stW, 1);
+    const scaleX = stW / ROAD_CELLS;
+    for (const c of cars) {
+      const frac = P.vmax > 0 ? c.v / P.vmax : 0;
+      sctx.fillStyle = rgb(speedColor(frac));
+      sctx.fillRect(Math.floor(c.pos * scaleX), y, Math.max(1, Math.ceil(scaleX)), 1);
+    }
+  }
+
+  // ---------- Track render ----------
+  function drawTrack() {
+    const W = track.width, H = track.height, cx = W/2, cy = H/2;
+    const R = Math.min(W, H) * 0.40;
+    const lane = R * 0.16;
+    tctx.clearRect(0, 0, W, H);
+    // asphalt ring
+    tctx.beginPath();
+    tctx.arc(cx, cy, R, 0, Math.PI*2);
+    tctx.lineWidth = lane;
+    tctx.strokeStyle = getVar("--track");
+    tctx.stroke();
+    // subtle dashed centre line
+    tctx.beginPath();
+    tctx.arc(cx, cy, R, 0, Math.PI*2);
+    tctx.lineWidth = 1.5;
+    tctx.setLineDash([4, 12]);
+    tctx.strokeStyle = getVar("--edge");
+    tctx.stroke();
+    tctx.setLineDash([]);
+    // cars
+    const carLen = lane * 0.92;
+    for (const c of cars) {
+      const ang = (c.pos / ROAD_CELLS) * Math.PI*2 - Math.PI/2;
+      const frac = P.vmax > 0 ? c.v / P.vmax : 0;
+      const col = speedColor(frac);
+      const x = cx + Math.cos(ang) * R;
+      const y = cy + Math.sin(ang) * R;
+      // glow for slow cars (brake lights)
+      if (frac < 0.4) {
+        tctx.beginPath();
+        tctx.arc(x, y, carLen*0.95, 0, Math.PI*2);
+        tctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${0.22*(1-frac)})`;
+        tctx.fill();
+      }
+      tctx.beginPath();
+      tctx.arc(x, y, carLen*0.5, 0, Math.PI*2);
+      tctx.fillStyle = rgb(col);
+      tctx.fill();
+    }
+  }
+
+  // ---------- Fundamental diagram ----------
+  // Sweep density across the whole range with the CURRENT speed/prob/brake,
+  // running a short fresh simulation at each point. Independent of live state.
+  function computeFD() {
+    const pts = [];
+    const jamDens = 1000 / CELL_M;             // ~133 veh/km (bumper to bumper)
+    for (let d = 2; d <= jamDens; d += 2.5) {
+      const n = Math.max(1, Math.min(ROAD_CELLS - 1, Math.round(d * ROAD_KM)));
+      const a = new Array(n);
+      for (let i = 0; i < n; i++) a[i] = { pos: Math.floor(i * ROAD_CELLS / n), v: P.vmax, nv: 0 };
+      let sum = 0, cnt = 0;
+      for (let s = 0; s < 320; s++) {
+        for (let i = 0; i < n; i++) {
+          const cur = a[i], ah = a[(i + 1) % n];
+          let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += ROAD_CELLS;
+          let v = Math.min(cur.v + 1, P.vmax);
+          if (v > gap) v = gap;
+          if (v > 0 && Math.random() < P.prob) v = Math.max(v - P.brake, 0);
+          cur.nv = v;
+        }
+        let vs = 0;
+        for (let i = 0; i < n; i++) { a[i].v = a[i].nv; a[i].pos = (a[i].pos + a[i].v) % ROAD_CELLS; vs += a[i].v; }
+        a.sort((x, y) => x.pos - y.pos);
+        if (s >= 170) { sum += vs; cnt++; }     // average after warm-up
+      }
+      const meanV = sum / cnt / n;
+      const realD = n / ROAD_KM;
+      pts.push({ d: realD, q: realD * meanV * KMH_PER_CELL });
+    }
+    fdPts = pts;
+    fdCrit = pts.reduce((m, p) => p.q > m.q ? p : m, { d: 0, q: 0 });
+  }
+
+  function drawFD(liveD, liveQ) {
+    const W = fdW, H = fdH;
+    fctx.clearRect(0, 0, W, H);
+    const padL = 62, padR = 18, padT = 18, padB = 40;
+    const plotW = W - padL - padR, plotH = H - padT - padB;
+    const maxD = 1000 / CELL_M;
+    const maxQ = Math.max(fdCrit.q * 1.15, 400);
+    const X = d => padL + (d / maxD) * plotW;
+    const Y = q => padT + plotH - (q / maxQ) * plotH;
+    const ink3 = getVar("--ink-3"), edge = getVar("--edge-soft"), accent = getVar("--accent");
+    fctx.font = "11px system-ui, sans-serif";
+    fctx.textBaseline = "middle";
+
+    // grid + y labels (flow)
+    fctx.strokeStyle = edge; fctx.fillStyle = ink3; fctx.lineWidth = 1;
+    const qStep = maxQ > 1800 ? 500 : 250;
+    for (let q = 0; q <= maxQ; q += qStep) {
+      const y = Y(q);
+      fctx.globalAlpha = .5; fctx.beginPath(); fctx.moveTo(padL, y); fctx.lineTo(W - padR, y); fctx.stroke();
+      fctx.globalAlpha = 1; fctx.textAlign = "right"; fctx.fillText(q.toLocaleString("sl"), padL - 8, y);
+    }
+    // x labels (density)
+    fctx.textAlign = "center";
+    for (let d = 0; d <= maxD; d += 20) {
+      const x = X(d);
+      fctx.fillText(String(Math.round(d)), x, H - padB + 16);
+    }
+    // axis titles
+    fctx.fillStyle = ink3;
+    fctx.fillText("gostota (vozil/km)", padL + plotW / 2, H - 8);
+    fctx.save(); fctx.translate(16, padT + plotH / 2); fctx.rotate(-Math.PI / 2);
+    fctx.fillText("pretok (vozil/h)", 0, 0); fctx.restore();
+
+    if (fdPts.length) {
+      // area fill under curve, coloured by speed regime
+      const grad = fctx.createLinearGradient(padL, 0, W - padR, 0);
+      grad.addColorStop(0, "rgba(52,211,153,.16)");
+      grad.addColorStop(fdCrit.d / maxD, "rgba(255,180,0,.16)");
+      grad.addColorStop(1, "rgba(255,59,48,.16)");
+      fctx.beginPath();
+      fctx.moveTo(X(fdPts[0].d), Y(0));
+      for (const p of fdPts) fctx.lineTo(X(p.d), Y(p.q));
+      fctx.lineTo(X(fdPts[fdPts.length - 1].d), Y(0));
+      fctx.closePath(); fctx.fillStyle = grad; fctx.fill();
+
+      // critical-density marker (vertical line at the peak)
+      fctx.strokeStyle = getVar("--jam"); fctx.globalAlpha = .55; fctx.setLineDash([3, 4]);
+      fctx.beginPath(); fctx.moveTo(X(fdCrit.d), Y(0)); fctx.lineTo(X(fdCrit.d), Y(fdCrit.q)); fctx.stroke();
+      fctx.setLineDash([]); fctx.globalAlpha = 1;
+
+      // the curve
+      fctx.beginPath();
+      fdPts.forEach((p, i) => i ? fctx.lineTo(X(p.d), Y(p.q)) : fctx.moveTo(X(p.d), Y(p.q)));
+      fctx.strokeStyle = accent; fctx.lineWidth = 2.5; fctx.lineJoin = "round"; fctx.stroke();
+
+      // capacity label
+      fctx.fillStyle = getVar("--ink-2"); fctx.textAlign = "center";
+      fctx.fillText("zmogljivost ≈ " + Math.round(fdCrit.q).toLocaleString("sl") + " voz/h", X(fdCrit.d), Y(fdCrit.q) - 12);
+    }
+
+    // live operating point
+    if (liveD != null) {
+      const x = X(liveD), y = Y(Math.max(0, liveQ));
+      fctx.beginPath(); fctx.arc(x, y, 9, 0, Math.PI * 2);
+      fctx.fillStyle = "rgba(52,211,153,.22)"; fctx.fill();
+      fctx.beginPath(); fctx.arc(x, y, 5, 0, Math.PI * 2);
+      fctx.fillStyle = getVar("--flow"); fctx.fill();
+      fctx.lineWidth = 2; fctx.strokeStyle = getVar("--panel"); fctx.stroke();
+    }
+  }
+
+  // ---------- Helpers ----------
+  function getVar(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim() || "#000";
+  }
+
+  // ---------- Render loop (decoupled from sim rate) ----------
+  let acc = 0, last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    if (running) {
+      acc += dt * P.rate;
+      let steps = 0;
+      while (acc >= 1 && steps < 40) { step(); acc -= 1; steps++; }
+    }
+    drawTrack();
+    const m = metrics();
+    // recompute the fundamental-diagram curve shortly after params settle
+    if (fdChangeAt && now - fdChangeAt > 130) { computeFD(); fdChangeAt = 0; }
+    drawFD(P.density, m.flow);
+    $("ctrSpeed").textContent = Math.round(m.speed);
+    $("ctrSub").textContent = "t = " + t + " s";
+    $("mSpeed").innerHTML = Math.round(m.speed) + '<span class="m-unit">km/h</span>';
+    $("mFlow").innerHTML = Math.round(m.flow).toLocaleString("sl") + '<span class="m-unit">voz/h</span>';
+    $("mJams").innerHTML = m.jams + '<span class="m-unit"></span>';
+    $("mStop").innerHTML = Math.round(m.stopped) + '<span class="m-unit">%</span>';
+    requestAnimationFrame(frame);
+  }
+
+  // ---------- Controls ----------
+  function bindSlider(id, valId, fn) {
+    const el = $(id);
+    el.addEventListener("input", () => fn(parseFloat(el.value)));
+    fn(parseFloat(el.value));
+  }
+  // Speed <-> event-probability coupling, grounded in Nilsson's power model:
+  // casualty-crash frequency scales with the square of speed (exponent ~2;
+  // serious ~3, fatal ~4). Anchored at 130 km/h -> 11%.
+  let linkProb = true;
+  const REF_KMH = 130, P_REF = 11, POW = 2;
+  const speedToProb = kmh => Math.max(0, Math.min(50, Math.round(P_REF * Math.pow(kmh / REF_KMH, POW))));
+  function syncProbFromSpeed() {
+    const pv = speedToProb(parseFloat($("sSpeed").value));
+    $("sProb").value = pv;
+    P.prob = pv / 100;
+    $("vProb").innerHTML = pv + '<span>%</span>';
+    fdChangeAt = performance.now();
+  }
+
+  bindSlider("sSpeed", "vSpeed", v => {
+    P.vmax = Math.max(1, Math.round(v / KMH_PER_CELL));
+    $("vSpeed").innerHTML = v + '<span>km/h</span>';   // show chosen limit directly
+    fdChangeAt = performance.now();
+    if (linkProb) syncProbFromSpeed();
+  });
+  bindSlider("sProb", "vProb", v => { P.prob = v/100; $("vProb").innerHTML = v + '<span>%</span>'; fdChangeAt = performance.now(); });
+  $("linkProb").addEventListener("change", e => {
+    linkProb = e.target.checked;
+    $("sProb").disabled = linkProb;
+    if (linkProb) syncProbFromSpeed();
+  });
+  bindSlider("sBrake", "vBrake", v => { P.brake = v; $("vBrake").innerHTML = v + '<span>&times; stopnja</span>'; fdChangeAt = performance.now(); });
+  bindSlider("sDens", "vDens", v => {
+    P.density = v; $("vDens").innerHTML = v + '<span>voz/km</span>';
+    build();
+  });
+  bindSlider("sRate", null, v => { P.rate = v; $("rateNote").textContent = v + " korakov/s"; });
+
+  $("playBtn").addEventListener("click", () => {
+    running = !running;
+    $("playBtn").innerHTML = running ? "&#9613;&#9613; Pavza" : "&#9654; Zaženi";
+  });
+  $("resetBtn").addEventListener("click", build);
+
+  // ---------- Theme toggle ----------
+  const root = document.documentElement;
+  function applyThemeLabel() {
+    const dark = (root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark":"light")) === "dark";
+    $("themeTxt").textContent = dark ? "Svetla tema" : "Temna tema";
+    $("themeIcon").innerHTML = dark ? "&#9788;" : "&#9789;";
+  }
+  $("themeBtn").addEventListener("click", () => {
+    const cur = root.getAttribute("data-theme") || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark":"light");
+    const next = cur === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", next);
+    applyThemeLabel();
+    clearSpacetime();
+  });
+  applyThemeLabel();
+
+  // ---------- Share ----------
+  const DEFAULT_URL = "https://janmacarolvrabec.github.io/Traffic-Jam-Simulator/";
+  // when served over http(s) share the live URL; for local file:// fall back to the published one
+  const SHARE_URL = /^https?:$/.test(location.protocol) ? location.href.split(/[?#]/)[0] : DEFAULT_URL;
+  const SHARE_TEXT = "Kdo je kriv za fantomski zastoj? 🕵️ Zastoj, ki nastane iz nič — brez nesreče, brez ovire. Trije poskusi razkrijejo krivca (pripravil Jan Macarol):";
+  const enc = encodeURIComponent;
+  // show the actual project link (live URL when hosted, else the published one)
+  $("projectUrl").href = SHARE_URL;
+  $("projectUrlTxt").textContent = SHARE_URL.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  function pop(url) { window.open(url, "_blank", "noopener,noreferrer,width=620,height=560"); }
+  $("shFb").addEventListener("click", () => pop("https://www.facebook.com/sharer/sharer.php?u=" + enc(SHARE_URL)));
+  $("shX").addEventListener("click", () => pop("https://twitter.com/intent/tweet?text=" + enc(SHARE_TEXT) + "&url=" + enc(SHARE_URL)));
+  $("shLi").addEventListener("click", () => pop("https://www.linkedin.com/sharing/share-offsite/?url=" + enc(SHARE_URL)));
+  $("shWa").addEventListener("click", () => pop("https://wa.me/?text=" + enc(SHARE_TEXT + " " + SHARE_URL)));
+  const toast = $("toast");
+  let toastT;
+  function showToast(msg) { toast.textContent = msg; toast.classList.add("show"); clearTimeout(toastT); toastT = setTimeout(() => toast.classList.remove("show"), 1900); }
+  $("shCopy").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText(SHARE_URL); showToast("Povezava kopirana ✓"); }
+    catch { showToast(SHARE_URL); }
+  });
+
+  // ---------- Go ----------
+  build();
+  requestAnimationFrame(frame);
+})();
+
+
+/* =====================================================================
+   SOCIAL LINKS — Jan Macarol. Fill in the real profile URLs below; any
+   left empty is simply not shown (no broken/placeholder links).
+   ===================================================================== */
+(() => {
+  "use strict";
+  const SOCIAL = [
+    { label: "Instagram", url: "https://instagram.com/janmacarol", svg: '<path d="M12 2c2.7 0 3 0 4.1.1 1 0 1.7.2 2.3.5.6.2 1.1.5 1.6 1s.8 1 1 1.6c.3.6.5 1.3.5 2.3.1 1.1.1 1.4.1 4.1s0 3-.1 4.1c0 1-.2 1.7-.5 2.3-.2.6-.5 1.1-1 1.6s-1 .8-1.6 1c-.6.3-1.3.5-2.3.5-1.1.1-1.4.1-4.1.1s-3 0-4.1-.1c-1 0-1.7-.2-2.3-.5-.6-.2-1.1-.5-1.6-1s-.8-1-1-1.6c-.3-.6-.5-1.3-.5-2.3C2 15 2 14.7 2 12s0-3 .1-4.1c0-1 .2-1.7.5-2.3.2-.6.5-1.1 1-1.6s1-.8 1.6-1c.6-.3 1.3-.5 2.3-.5C9 2 9.3 2 12 2Zm0 1.8c-2.7 0-3 0-4 .1-.8 0-1.2.2-1.5.3-.4.1-.6.3-.9.6-.3.3-.5.5-.6.9-.1.3-.3.7-.3 1.5-.1 1-.1 1.3-.1 4s0 3 .1 4c0 .8.2 1.2.3 1.5.1.4.3.6.6.9.3.3.5.5.9.6.3.1.7.3 1.5.3 1 .1 1.3.1 4 .1s3 0 4-.1c.8 0 1.2-.2 1.5-.3.4-.1.6-.3.9-.6.3-.3.5-.5.6-.9.1-.3.3-.7.3-1.5.1-1 .1-1.3.1-4s0-3-.1-4c0-.8-.2-1.2-.3-1.5-.1-.4-.3-.6-.6-.9-.3-.3-.5-.5-.9-.6-.3-.1-.7-.3-1.5-.3-1-.1-1.3-.1-4-.1Zm0 3.1a5.1 5.1 0 1 1 0 10.2 5.1 5.1 0 0 1 0-10.2Zm0 1.8a3.3 3.3 0 1 0 0 6.6 3.3 3.3 0 0 0 0-6.6Zm5.3-3.2a1.2 1.2 0 1 1 0 2.4 1.2 1.2 0 0 1 0-2.4Z"/>' },
+    { label: "Facebook", url: "https://facebook.com/janmacarol", svg: '<path d="M22 12a10 10 0 1 0-11.6 9.9v-7H7.9V12h2.5V9.8c0-2.5 1.5-3.9 3.8-3.9 1.1 0 2.2.2 2.2.2v2.5h-1.3c-1.2 0-1.6.8-1.6 1.6V12h2.8l-.4 2.9h-2.4v7A10 10 0 0 0 22 12Z"/>' },
+    { label: "LinkedIn", url: "https://www.linkedin.com/in/janmacarol", svg: '<path d="M20.4 3H3.6A.6.6 0 0 0 3 3.6v16.8a.6.6 0 0 0 .6.6h16.8a.6.6 0 0 0 .6-.6V3.6a.6.6 0 0 0-.6-.6ZM8.3 18.3H5.6V9.7h2.7v8.6ZM7 8.5a1.6 1.6 0 1 1 0-3.1 1.6 1.6 0 0 1 0 3.1Zm11.3 9.8h-2.7v-4.2c0-1 0-2.3-1.4-2.3s-1.6 1.1-1.6 2.2v4.3h-2.7V9.7h2.6v1.2h.1a2.9 2.9 0 0 1 2.6-1.4c2.8 0 3.3 1.8 3.3 4.2v4.6Z"/>' },
+    { label: "TikTok", url: "", svg: '<path d="M16.5 3c.3 2.1 1.5 3.4 3.5 3.5v2.4c-1.2.1-2.3-.3-3.5-1v5.6c0 3.6-2.6 5.9-5.7 5.9-2.9 0-5.1-2.1-5.1-5 0-3 2.4-5.1 5.6-4.8v2.6c-.4-.1-.8-.2-1.2-.2-1.2 0-2.1.9-2.1 2.1 0 1.3 1 2.2 2.3 2.1 1.3 0 2.1-1 2.1-2.4V3h2.6Z"/>' },
+    { label: "YouTube", url: "", svg: '<path d="M23 12s0-3.2-.4-4.7c-.2-.8-.9-1.5-1.7-1.7C19.4 5.2 12 5.2 12 5.2s-7.4 0-8.9.4c-.8.2-1.5.9-1.7 1.7C1 8.8 1 12 1 12s0 3.2.4 4.7c.2.8.9 1.5 1.7 1.7 1.5.4 8.9.4 8.9.4s7.4 0 8.9-.4c.8-.2 1.5-.9 1.7-1.7.4-1.5.4-4.7.4-4.7Zm-13 3V9l5.2 3-5.2 3Z"/>' },
+    { label: "X", url: "https://x.com/jmacarolv", svg: '<path d="M18.9 2H22l-7.1 8.1L23 22h-6.6l-5.2-6.8L5.3 22H2.1l7.6-8.7L1.7 2h6.8l4.7 6.2L18.9 2Zm-1.2 18h1.8L7.1 3.9H5.2L17.7 20Z"/>' },
+    { label: "Spletna stran", url: "", svg: '<path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm6.9 6h-2.8a15.7 15.7 0 0 0-1.3-3.4A8 8 0 0 1 18.9 8ZM12 4c.8 1.1 1.4 2.5 1.8 4h-3.6c.4-1.5 1-2.9 1.8-4ZM4.3 14a8 8 0 0 1 0-4h3.2a17.6 17.6 0 0 0 0 4H4.3Zm.8 2h2.8c.3 1.2.8 2.4 1.3 3.4A8 8 0 0 1 5.1 16Zm2.8-8H5.1a8 8 0 0 1 4.1-3.4C8.7 5.6 8.2 6.8 7.9 8ZM12 20c-.8-1.1-1.4-2.5-1.8-4h3.6c-.4 1.5-1 2.9-1.8 4Zm2.3-6H9.7a15.3 15.3 0 0 1 0-4h4.6a15.3 15.3 0 0 1 0 4Zm.6 5.4c.5-1 1-2.2 1.3-3.4h2.8a8 8 0 0 1-4.1 3.4Zm1.6-5.4a17.6 17.6 0 0 0 0-4h3.2a8 8 0 0 1 0 4h-3.2Z"/>' }
+  ];
+  const bar = document.getElementById("socialBar");
+  if (!bar) return;
+  const items = SOCIAL.filter(s => s.url && s.url.trim());
+  if (!items.length) { bar.style.display = "none"; return; }
+  bar.innerHTML = '<span class="sc-lab">Sledite</span>' + items.map(s =>
+    `<a class="soc" href="${s.url}" target="_blank" rel="noopener" aria-label="${s.label}" title="${s.label}"><svg viewBox="0 0 24 24">${s.svg}</svg></a>`
+  ).join("");
+})();
+
+
+/* =====================================================================
+   EXPERIMENT 2 — single stopped car on a straight kilometre.
+   Deterministic (no random slowdown): the ONLY cause of a jam is the
+   user clicking a car. Shows the backward-travelling wave persisting
+   long after the offending car has driven on.
+   ===================================================================== */
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const CELL_M = 7.5;              // m per cell
+  const L = 133;                   // ~1 km / 7.5 m
+  const VMAX = 4;                  // ~108 km/h
+  const STOP_STEPS = 6;            // forced-stop duration (s), like a hard brake
+  const STEPS_PER_S = 8;
+
+  const road = $("road"), rx = road.getContext("2d");
+  const rst = $("roadST"), rsx = rst.getContext("2d");
+  const RW = road.width, RH = road.height, SW = rst.width, SH = rst.height;
+
+  let cars = [];                   // {pos, v, stop}
+  let dens = 32;
+  let interacted = false;
+  let acc = 0, last = performance.now();
+
+  const getVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#000";
+  function speedColor(f) {
+    f = Math.max(0, Math.min(1, f));
+    const s = [[255,59,48],[255,180,0],[52,211,153]];
+    const t = f*2, i = Math.min(1, Math.floor(t)), g = t-i, a = s[i], b = s[i+1];
+    return `rgb(${Math.round(a[0]+(b[0]-a[0])*g)},${Math.round(a[1]+(b[1]-a[1])*g)},${Math.round(a[2]+(b[2]-a[2])*g)})`;
+  }
+
+  function build() {
+    const n = Math.max(1, Math.min(L-1, Math.round(dens * L * CELL_M / 1000)));
+    cars = [];
+    for (let i = 0; i < n; i++) cars.push({ pos: Math.floor(i*L/n), v: VMAX, stop: 0 });
+    for (let i = 1; i < cars.length; i++) if (cars[i].pos <= cars[i-1].pos) cars[i].pos = cars[i-1].pos + 1;
+    clearST();
+    $("e2Note").textContent = n + " vozil · 1,0 km";
+  }
+
+  function step() {
+    const n = cars.length; if (!n) return;
+    for (let i = 0; i < n; i++) {
+      const cur = cars[i], ah = cars[(i+1) % n];
+      let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += L;
+      let v;
+      if (cur.stop > 0) { v = 0; cur.stop--; }          // forced hard stop
+      else { v = Math.min(cur.v + 1, VMAX); if (v > gap) v = gap; }  // NO random term
+      cur.nv = v;
+    }
+    for (let i = 0; i < n; i++) { cars[i].v = cars[i].nv; cars[i].pos = (cars[i].pos + cars[i].v) % L; }
+    cars.sort((a, b) => a.pos - b.pos);
+    pushST();
+  }
+
+  function clearST() { rsx.fillStyle = getVar("--bg-grad-2"); rsx.fillRect(0, 0, SW, SH); }
+  function pushST() {
+    rsx.drawImage(rst, 0, 1, SW, SH-1, 0, 0, SW, SH-1);
+    const y = SH-1, sx = SW / L;
+    rsx.fillStyle = getVar("--bg-grad-2"); rsx.fillRect(0, y, SW, 1);
+    for (const c of cars) { rsx.fillStyle = speedColor(c.v/VMAX); rsx.fillRect(Math.floor(c.pos*sx), y, Math.max(1, Math.ceil(sx)), 1); }
+  }
+
+  function draw() {
+    rx.clearRect(0, 0, RW, RH);
+    const laneY = RH/2, laneH = RH*0.52;
+    rx.fillStyle = getVar("--track"); rx.fillRect(0, laneY - laneH/2, RW, laneH);
+    rx.strokeStyle = getVar("--edge"); rx.setLineDash([16, 16]); rx.lineWidth = 2;
+    rx.beginPath(); rx.moveTo(0, laneY); rx.lineTo(RW, laneY); rx.stroke(); rx.setLineDash([]);
+    const sx = RW / L, cw = Math.max(7, sx*0.78), ch = laneH*0.6;
+    for (const c of cars) {
+      const x = c.pos * sx, f = c.v / VMAX, col = speedColor(f);
+      if (c.stop > 0 || f < 0.3) {
+        rx.fillStyle = col.replace("rgb", "rgba").replace(")", ",0.3)");
+        rrect(x-3, laneY - ch/2 - 3, cw+6, ch+6, 6); rx.fill();
+      }
+      rx.fillStyle = col; rrect(x, laneY - ch/2, cw, ch, 3); rx.fill();
+    }
+  }
+  function rrect(x, y, w, h, r) {
+    rx.beginPath();
+    if (rx.roundRect) rx.roundRect(x, y, w, h, r);
+    else rx.rect(x, y, w, h);
+  }
+
+  function stopNearest(clientX) {
+    const rect = road.getBoundingClientRect();
+    const cell = ((clientX - rect.left) / rect.width) * L;
+    let best = -1, bd = 1e9;
+    for (let i = 0; i < cars.length; i++) {
+      let d = Math.abs(cars[i].pos - cell); d = Math.min(d, L - d);
+      if (d < bd) { bd = d; best = i; }
+    }
+    if (best >= 0) { cars[best].stop = STOP_STEPS; flash(); }
+  }
+  function flash() { if (!interacted) { interacted = true; const h = $("roadHint"); if (h) h.style.opacity = "0"; } }
+
+  road.addEventListener("click", e => stopNearest(e.clientX));
+  road.addEventListener("touchstart", e => { if (e.touches[0]) { stopNearest(e.touches[0].clientX); e.preventDefault(); } }, { passive: false });
+  $("e2Stop").addEventListener("click", () => { if (cars.length) { cars[Math.floor(Math.random()*cars.length)].stop = STOP_STEPS; flash(); } });
+  $("e2Reset").addEventListener("click", build);
+  $("e2Dens").addEventListener("input", e => { dens = +e.target.value; $("e2vDens").innerHTML = dens + '<span>voz/km</span>'; build(); });
+
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    acc += dt * STEPS_PER_S;
+    let s = 0; while (acc >= 1 && s < 20) { step(); acc -= 1; s++; }
+    draw();
+    requestAnimationFrame(frame);
+  }
+
+  build();
+  requestAnimationFrame(frame);
+})();
+
+
+/* =====================================================================
+   EXPERIMENT 3 — 110 vs 130 km/h, A/B on identical roads.
+   The ONLY difference is the speed limit. Event probability grows with
+   speed  p(v) = K*v  (in a fixed reaction time you cover v*tau metres, so
+   faster => less margin => more events). Slow-to-start enables the flow
+   breakdown seen on real motorways. We measure realised travel speed,
+   time spent in stop-and-go, and events per 100 km for each limit.
+   ===================================================================== */
+(() => {
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const CELL_M = 7.5, KMH = CELL_M * 3.6;
+  const L = 400;                    // 3 km ring
+  const K = 0.01;                   // p(v) = K * v^2  (Nilsson-like, quadratic in speed)
+  const P_SLOW = 0.4;               // restart probability from standstill
+  const STEPS_PER_S = 10;
+
+  function makeSim(vmax, canvasId) {
+    const cv = $(canvasId), cx = cv.getContext("2d");
+    return { vmax, cv, cx, W: cv.width, H: cv.height, cars: [],
+             sumV: 0, vehSteps: 0, jamSteps: 0, events: 0, fullStops: 0, vehKm: 0 };
+  }
+  const A = makeSim(4, "road110");  // ~110 km/h
+  const B = makeSim(5, "road130");  // ~130 km/h
+  let dens = 20, acc = 0, last = performance.now(), uiTick = 0;
+
+  // --- Accelerated-time accumulator: crashes pile up per vehicle-km ---
+  // Base rate is illustrative (motorway order of magnitude); the science is the
+  // Nilsson ratio: casualty crashes x1.40, fatal x1.95 at 130 vs 110.
+  const KM_PER_SEC = 50e6, BASE_CAS = 1e-7, BASE_FAT = 3.5e-9, R_CAS = 1.40, R_FAT = 1.95;
+  let odoKm = 0, cas110 = 0, cas130 = 0, fat110 = 0, fat130 = 0;
+  const nf = n => Math.round(n).toLocaleString("sl");
+  function fmtKm(k) {
+    if (k >= 1e9) return (k / 1e9).toFixed(2).replace(".", ",") + " mrd";
+    if (k >= 1e6) return (k / 1e6).toFixed(1).replace(".", ",") + " mio";
+    return nf(k);
+  }
+  function accumulate(dt) {
+    const dkm = KM_PER_SEC * dt;
+    odoKm += dkm;
+    cas110 += BASE_CAS * dkm;         cas130 += BASE_CAS * R_CAS * dkm;
+    fat110 += BASE_FAT * dkm;         fat130 += BASE_FAT * R_FAT * dkm;
+  }
+  function updateAccum() {
+    $("odoKm").textContent = fmtKm(odoKm);
+    $("acc110").textContent = nf(cas110); $("acc130").textContent = nf(cas130);
+    $("fat110").textContent = nf(fat110); $("fat130").textContent = nf(fat130);
+    const dCas = Math.round(cas130 - cas110), dFat = Math.round(fat130 - fat110);
+    $("accDelta").textContent = dCas > 0 ? "+" + nf(dCas) + " več pri 130  (+40 %)" : "";
+    $("fatDelta").textContent = dFat > 0 ? "+" + nf(dFat) + " več pri 130  (+95 %)" : "";
+  }
+  function resetAccum() { odoKm = cas110 = cas130 = fat110 = fat130 = 0; }
+
+  const getVar = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim() || "#000";
+  function speedColor(f) {
+    f = Math.max(0, Math.min(1, f));
+    const s = [[255,59,48],[255,180,0],[52,211,153]];
+    const t = f*2, i = Math.min(1, Math.floor(t)), g = t-i, a = s[i], b = s[i+1];
+    return `rgb(${Math.round(a[0]+(b[0]-a[0])*g)},${Math.round(a[1]+(b[1]-a[1])*g)},${Math.round(a[2]+(b[2]-a[2])*g)})`;
+  }
+
+  function resetSim(S) {
+    const n = Math.max(1, Math.min(L-1, Math.round(dens * L * CELL_M / 1000)));
+    S.cars = [];
+    for (let i = 0; i < n; i++) S.cars.push({ pos: Math.floor(i*L/n), v: S.vmax });
+    for (let i = 1; i < S.cars.length; i++) if (S.cars[i].pos <= S.cars[i-1].pos) S.cars[i].pos = S.cars[i-1].pos + 1;
+    S.sumV = S.vehSteps = S.jamSteps = S.events = S.fullStops = 0; S.vehKm = 0;
+  }
+  function resetAll() {
+    resetSim(A); resetSim(B); resetAccum(); uiTick = 0;
+    $("e3Note").textContent = A.cars.length + " vozil na cesto · 3,0 km";
+    $("e3Verdict").innerHTML = "Zbiram izmerjene podatke &hellip; (pustite teči nekaj sekund)";
+  }
+
+  function step(S) {
+    const n = S.cars.length; if (!n) return;
+    for (let i = 0; i < n; i++) {
+      const cur = S.cars[i], ah = S.cars[(i+1) % n];
+      let gap = ah.pos - cur.pos - 1; if (gap < 0) gap += L;
+      let v = Math.min(cur.v + 1, S.vmax);
+      if (v > gap) v = gap;
+      const p = cur.v === 0 ? P_SLOW : Math.min(0.9, K * v * v);   // slow-to-start, else p grows with speed^2
+      if (v > 0 && Math.random() < p) { v = Math.max(v - Math.max(1, Math.round(v*0.5)), 0); S.events++; }
+      if (v === 0 && cur.v > 0) S.fullStops++;                 // a fresh complete stop
+      cur.nv = v;
+    }
+    let vstep = 0, jam = 0;
+    for (let i = 0; i < n; i++) {
+      S.cars[i].v = S.cars[i].nv; S.cars[i].pos = (S.cars[i].pos + S.cars[i].v) % L;
+      vstep += S.cars[i].v; if (S.cars[i].v <= 1) jam++;
+    }
+    S.cars.sort((a, b) => a.pos - b.pos);
+    S.sumV += vstep; S.vehSteps += n; S.jamSteps += jam; S.vehKm += vstep * CELL_M / 1000;
+  }
+
+  function stats(S) {
+    const speed = S.vehSteps ? (S.sumV / S.vehSteps) * KMH : 0;
+    const jamPct = S.vehSteps ? (S.jamSteps / S.vehSteps) * 100 : 0;
+    const evPer100 = S.vehKm > 0.5 ? S.events / (S.vehKm / 100) : 0;
+    const stopPer100 = S.vehKm > 0.5 ? S.fullStops / (S.vehKm / 100) : 0;
+    return { speed, jamPct, evPer100, stopPer100 };
+  }
+
+  function draw(S) {
+    const { cx, W, H } = S, laneY = H/2, laneH = H*0.56;
+    cx.clearRect(0, 0, W, H);
+    cx.fillStyle = getVar("--track"); cx.fillRect(0, laneY - laneH/2, W, laneH);
+    cx.strokeStyle = getVar("--edge"); cx.setLineDash([14, 14]); cx.lineWidth = 2;
+    cx.beginPath(); cx.moveTo(0, laneY); cx.lineTo(W, laneY); cx.stroke(); cx.setLineDash([]);
+    const sx = W / L, cw = Math.max(4, sx*2.2), ch = laneH*0.62;
+    for (const c of S.cars) {
+      const x = c.pos * sx, f = c.v / S.vmax;
+      cx.fillStyle = speedColor(f);
+      cx.beginPath();
+      if (cx.roundRect) cx.roundRect(x, laneY - ch/2, cw, ch, 2); else cx.rect(x, laneY - ch/2, cw, ch);
+      cx.fill();
+    }
+  }
+
+  function updateUI() {
+    const a = stats(A), b = stats(B);
+    $("s110speed").innerHTML = Math.round(a.speed) + '<small> km/h</small>';
+    $("s130speed").innerHTML = Math.round(b.speed) + '<small> km/h</small>';
+    $("s110jam").textContent = a.jamPct.toFixed(0) + " %";
+    $("s130jam").textContent = b.jamPct.toFixed(0) + " %";
+    $("s110ev").textContent = Math.round(a.evPer100);
+    $("s130ev").textContent = Math.round(b.evPer100);
+    $("s110stop").textContent = Math.round(a.stopPer100);
+    $("s130stop").textContent = Math.round(b.stopPer100);
+    // flag the worse (130) figures
+    $("s130jam").className = "ls-v" + (b.jamPct > a.jamPct + 0.5 ? " ls-bad" : "");
+    $("s130ev").className = "ls-v" + (b.evPer100 > a.evPer100 + 0.5 ? " ls-bad" : "");
+    $("s130stop").className = "ls-v" + (b.stopPer100 > a.stopPer100 + 0.5 ? " ls-bad" : "");
+    // verdict once enough data has accumulated for stable figures
+    if (A.vehKm > 140) {
+      const dJam  = a.jamPct    > 0.5 ? Math.round((b.jamPct    / a.jamPct    - 1) * 100) : 0;
+      const dStop = a.stopPer100 > 0.5 ? Math.round((b.stopPer100 / a.stopPer100 - 1) * 100) : 0;
+      const dSpeed = Math.round(b.speed - a.speed);
+      let head;
+      if (dSpeed <= -3)     head = "V gostem prometu je pri <b>130</b> potovalna hitrost celo <b>nižja</b> (" + dSpeed + " km/h). ";
+      else if (dSpeed >= 3) head = "V gostem prometu je pri <b>130</b> potovalna hitrost le +" + dSpeed + " km/h. ";
+      else                  head = "<b>V gostem prometu je potovalna hitrost skoraj enaka</b> (razlika " + (dSpeed>=0?"+":"") + dSpeed + " km/h). ";
+      $("e3Verdict").innerHTML = head +
+        "Na pretok torej 110 in 130 skoraj ne vplivata" +
+        (dStop > 3 ? " (pri 130 le nekaj več popolnih zaustavitev, +" + dStop + " %)" : "") +
+        ". <b>Prava razlika je v varnosti:</b> po potenčnem modelu ima 130&nbsp;km/h <b>+40 % nesreč s poškodbami</b> in <b>+95 % smrtnih nesreč</b> &mdash; za enak čas prihoda. Zato je nižja omejitev smiselna.";
+    }
+  }
+
+  $("e3Dens").addEventListener("input", e => { dens = +e.target.value; $("e3vDens").innerHTML = dens + '<span>voz/km</span>'; resetAll(); });
+  $("e3Reset").addEventListener("click", resetAll);
+
+  function frame(now) {
+    const dt = Math.min(0.1, (now - last) / 1000); last = now;
+    acc += dt * STEPS_PER_S;
+    let s = 0; while (acc >= 1 && s < 25) { step(A); step(B); acc -= 1; s++; }
+    accumulate(dt);
+    draw(A); draw(B);
+    if (++uiTick % 6 === 0) { updateUI(); updateAccum(); }
+    requestAnimationFrame(frame);
+  }
+
+  resetAll();
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
