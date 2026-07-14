@@ -2,7 +2,9 @@
 
 Interaktivni simulator **fantomskih zastojev** (angl. *phantom traffic jams*) — zastojev, ki nastanejo brez vsakršne ovire, zgolj iz drobnih motenj v vožnji, ki se ojačajo v val, ki potuje nazaj po cesti.
 
-Poskus pripravil **Jan Macarol**.
+Avtor eksperimentov: **Jan Macarol**. Zasnovano po recenziranih znanstvenih raziskavah (Sugiyama 2008, Nagel–Schreckenberg 1992, Nilsson–Elvik potenčni model).
+
+> **Metodološka izjava.** Vse simulacije so zgrajene izključno na podatkih in razmerjih iz navedenih recenziranih raziskav in **niso prirejene** za vnaprej želen rezultat. Kjer razlike ni (npr. potovalni čas 110 proti 130 v gostem prometu), simulator to pošteno pokaže; kjer je (varnostna razmerja), izhaja neposredno iz objavljenih koeficientov. Edina ilustrativna vrednost je absolutna osnovna stopnja nesreč v panelu »Skozi čas«; razmerja (×1,40, ×1,95) so iz Nilssonovega modela.
 
 Simulator ponuja **dva poskusa**:
 
